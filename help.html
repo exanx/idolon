@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idolon Help Center</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --link-color: #007aff;
+            --link-hover-color: #0056b3;
+            --active-bg: rgba(0, 122, 255, 0.1);
+            --active-text: #007aff;
+            --glow-color-1: #007bff;
+            --glow-color-2: #8a2be2;
+            --button-bg: #007aff;
+            --button-text: #ffffff;
+            --button-hover-bg: #0056b3;
+            --warning-bg: rgba(255, 240, 230, 0.8);
+            --warning-border: #faad14;
+        }
+        html[data-mode="dark"] {
+            --bg-color: #0d1117;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --card-bg: rgba(22, 27, 34, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --link-color: #58a6ff;
+            --link-hover-color: #a3d3ff;
+            --active-bg: rgba(88, 166, 255, 0.1);
+            --active-text: #58a6ff;
+            --glow-color-1: #007bff;
+            --glow-color-2: #8a2be2;
+            --button-bg: #58a6ff;
+            --button-text: #0d1117;
+            --button-hover-bg: #a3d3ff;
+            --warning-bg: rgba(40, 30, 25, 0.8);
+            --warning-border: #d48806;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        /* --- INTERACTIVE GLOWING BACKGROUND --- */
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1; }
+        .glow { position: absolute; top: 0; left: 0; border-radius: 50%; opacity: 0.2; filter: blur(120px); will-change: transform; transform: translate(-50%, -50%); }
+        #glow1 { background: var(--glow-color-1); width: 60vmin; height: 60vmin; }
+        #glow2 { background: var(--glow-color-2); width: 45vmin; height: 45vmin; }
+        @media (max-width: 768px) { .glow { filter: blur(80px); } }
+        /* --- UI STYLING --- */
+        .glass-card { background: var(--card-bg); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; }
+        .prose { max-width: 80ch; color: var(--text-secondary); }
+        .prose h1, .prose h2, .prose h3, .prose strong { color: var(--text-primary); }
+        .prose h2 { font-size: 1.25em; margin-bottom: 1.5em; font-weight: 600; }
+        .prose h3 { font-size: 1.25em; margin-top: 2em; }
+        .prose a { color: var(--link-color); text-decoration: none; font-weight: 500; }
+        .prose a:hover { color: var(--link-hover-color); text-decoration: underline; }
+        .prose code { background-color: var(--border-color); color: var(--text-primary); padding: 0.2em 0.4em; border-radius: 6px; }
+        .prose pre { background-color: rgba(0,0,0,0.8); border-radius: 8px; padding: 1em; }
+        .prose pre code { color: #f1f1f1; background-color: transparent; }
+        .prose ul { list-style-type: disc; padding-left: 1.5em; }
+        .prose ol { list-style-type: decimal; padding-left: 1.5em; }
+        .prose li { margin-bottom: 0.5em; }
+        aside a { transition: all 0.2s ease-in-out; }
+        aside a.active { background-color: var(--active-bg); color: var(--active-text); font-weight: 600; transform: translateX(5px); }
+        .styled-button { background-color: var(--button-bg); color: var(--button-text); transition: background-color 0.2s ease-in-out; }
+        .styled-button:hover { background-color: var(--button-hover-bg); }
+        .warning-box {
+            background-color: var(--warning-bg);
+            border-left: 4px solid var(--warning-border);
+            padding: 1em;
+            border-radius: 8px;
+            margin-top: 1.5em;
+        }
+        .warning-box p, .warning-box li {
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .step { font-weight: bold; color: var(--link-color); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="interactive-bg">
+        <div id="glow1" class="glow"></div>
+        <div id="glow2" class="glow"></div>
+    </div>
+
+    <!-- START: NEW FLOATING BUTTONS -->
+    <div class="fixed top-4 right-4 z-50 flex items-center space-x-4">
+        <a href="/" id="back-to-app-button" class="text-sm font-semibold rounded-lg px-3 py-1.5 styled-button">← Back to App</a>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="theme-switch" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+        </label>
+    </div>
+    <!-- END: NEW FLOATING BUTTONS -->
+
+    <!-- START: NEW PAGE TITLE -->
+    <div class="text-center pt-16 pb-8 px-4">
+        <a href="/" class="inline-flex items-center justify-center space-x-4 group">
+            <img src="favicon.svg" alt="Idolon Logo" class="h-10 w-10 group-hover:opacity-80 transition-opacity">
+            <span class="text-3xl font-bold text-primary group-hover:opacity-80 transition-opacity">Idolon Help Center</span>
+        </a>
+    </div>
+    <!-- END: NEW PAGE TITLE -->
+
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row pb-8 md:space-x-8 lg:space-x-12">
+
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 md:sticky md:top-8 self-start mb-10 md:mb-0">
+                <nav class="space-y-2" id="help-nav">
+                    <a href="#getting-started" class="group flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-opacity-50 hover:bg-gray-500/10">Getting Started</a>
+                    <a href="#user-guide" class="group flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-opacity-50 hover:bg-gray-500/10">User Guide</a>
+                    <a href="#privacy" class="group flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-opacity-50 hover:bg-gray-500/10">Privacy Policy</a>
+                    <a href="#terms" class="group flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-opacity-50 hover:bg-gray-500/10">Terms & Conditions</a>
+                    <a href="#licenses" class="group flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-opacity-50 hover:bg-gray-500/10">Licenses</a>
+                    <a href="#self-hosting" class="group flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-opacity-50 hover:bg-gray-500/10">Self-Hosting Guide</a>
+                </nav>
+
+               
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 min-w-0 space-y-8">
+                <section id="getting-started" class="prose glass-card rounded-xl p-8 lg:p-12">
+                    <h2>Getting Started</h2>
+                    <p>Welcome to Idolon Chat! This guide will walk you through everything you need to know to get the most out of your private, secure AI chat experience.</p>
+                    
+                    <h3>What is Idolon Chat?</h3>
+                    <p>Idolon Chat is a unique AI chat application that puts you in control. Unlike other services that use a shared, central API key, Idolon Chat is designed to use <strong>your own personal API keys</strong> from various AI providers. This approach has several major benefits:</p>
+                    <ul>
+                        <li><strong>Complete Privacy:</strong> Your conversations are between you and the AI provider. We act only as a secure interface and never see, store, or log your chat content on our proxy server.</li>
+                        <li><strong>Total Control:</strong> You choose the AI models you want to use and have full visibility over your API usage and costs.</li>
+                        <li><strong>User-Controlled Encryption:</strong> Your chat history is end-to-end encrypted. The content is encrypted on your device *before* being saved to your personal cloud database. Only you, with your account, can decrypt and view your conversations.</li>
+                    </ul>
+
+                    <h3>Your First Steps</h3>
+                    <ol>
+                        <li><strong>Sign In (Recommended):</strong> Create an account or sign in with Google. This is highly recommended to securely back up your encrypted settings and chat history across devices.</li>
+                        <li><strong>Add an API Key:</strong> Click the "Settings" icon (⚙️). Under the "API & Model" section, choose a provider (like Google Gemini, Groq, or OpenRouter) and paste in your personal API key. You can get free keys from providers like <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a> or <a href="https://console.groq.com/keys" target="_blank" rel="noopener">GroqCloud</a>.</li>
+                        <li><strong>Start Chatting:</strong> That's it! You can now chat with the default Idolon assistant or create your own custom AI characters.</li>
+                    </ol>
+
+                    <h3>A Note on Content & Safety</h3>
+                    <div class="warning-box">
+                       <p>Idolon Chat is designed with safety as the default. By default, the app instructs the AI to decline to generate inappropriate content (such as sexually explicit, hateful, or violent material).</p>
+                       <p class="mt-2">However, we believe in user control. In the 'Danger Zone' of the settings panel, you will find a <strong>"Turn Off Filters"</strong> toggle. This feature is intended for mature users (18+) and has important limitations:</p>
+                       <ul class="mt-2 list-disc pl-5">
+                          <li>Enabling this removes Idolon's explicit safety instructions to the AI, which can allow for more mature or unfiltered conversations.</li>
+                          <li><strong>This does not bypass the hard-coded safety systems of the API provider</strong> (Google, Groq, etc.). You are always subject to their Acceptable Use Policy.</li>
+                          <li>Your usage and generated content remain subject to the Terms of Service of your chosen API provider at all times.</li>
+                       </ul>
+                    </div>
+                </section>
+
+                <section id="user-guide" class="prose glass-card rounded-xl p-8 lg:p-12">
+                    <h2>User Guide</h2>
+                    
+                    <h3>Managing Chats & Characters</h3>
+                    <ul>
+                        <li><strong>Creating a Character:</strong> Click the "Add New Character" button in the sidebar. Give your AI a name and a persona. The persona is the most important part—it defines the AI's personality, knowledge, and style of speaking.</li>
+                        <li><strong>Creating a Group Chat:</strong> Click the "Add New Group" button. Give the group a name and select at least two existing characters to be participants.</li>
+                        <li><strong>Editing & Deleting:</strong> Click the pencil icon (✎) next to any chat in the sidebar to edit its details or delete it.</li>
+                    </ul>
+
+                    <h3>Special Chat Commands</h3>
+                    <p>You can use special commands in the message bar for advanced features:</p>
+                    <ul>
+                        <li><code>/image [your prompt]</code>: Directly generates an image based on your description. (Requires a Gemini API key).</li>
+                        <li><code>/sendpic [your prompt]</code>: Asks the AI character to generate a "selfie" or image based on its persona and your request. (Requires a Gemini API key).</li>
+                    </ul>
+
+                    <h3>The Settings Panel Explained</h3>
+                    <dl>
+                        <dt><strong>Account</strong></dt>
+                        <dd class="mb-4">Sign in with Google or Email to back up and sync your data. You can also sign out here.</dd>
+                        
+                        <dt><strong>Appearance</strong></dt>
+                        <dd class="mb-4">Switch between Dark and Light mode, change the interface style to mimic popular messaging apps (iMessage, WhatsApp, etc.), and toggle the visibility of avatars in chat.</dd>
+                        
+                        <dt><strong>API & Model</strong></dt>
+                        <dd class="mb-4">This is the heart of the app. Select your preferred AI provider (Google Gemini, Groq, OpenRouter) and enter your corresponding API key. You can also select specific models from each provider.</dd>
+                        
+                        <dt><strong>Data Management</strong></dt>
+                        <dd class="mb-4">Use the "Import Character Data" button to load a character and their chat history from a <code>.json</code> file. Use the "Download" button in the main chat header to save your current character and chat.</dd>
+                        
+                        <dt><strong>Danger Zone</strong></dt>
+                        <dd class="mb-4">
+                            <strong>Turn Off Filters:</strong> As described above, this removes the app's default safety prompt.
+                            <br>
+                            <strong>Use Secure Proxy:</strong> Recommended. This routes your API calls through our secure, zero-logging proxy server. Your API key is never exposed directly from your browser. You must be signed in to use this feature.
+                            <br>
+                            <strong>Reset & Erase All Data:</strong> This is permanent. It will delete all your characters, chats, and settings from both your device and your cloud account. This action cannot be undone.
+                        </dd>
+                    </dl>
+                </section>
+
+                <section id="privacy" class="prose glass-card rounded-xl p-8 lg:p-12">
+                    <h2>Privacy Policy</h2>
+                    <p><em>Last Updated: [Enter Current Date, e.g., October 26, 2023]</em></p>
+                    <p>Your privacy is the foundation of this application. Our architecture is designed from the ground up to protect your data and ensure that your conversations remain yours alone.</p>
+                    
+                    <h3>Our Core Privacy Promise</h3>
+                    <p>We operate on a principle of zero-knowledge regarding your sensitive content. Here's what that means for you:</p>
+                    <ul>
+                        <li><strong>We cannot read your chats or API keys.</strong> All sensitive data, including every message you send and receive and your personal API keys, is encrypted on your device *before* it is sent to the cloud for storage. The encryption key is securely managed by your user account, and we, the developers, do not have access to it.</li>
+                        <li><strong>We do not sell your data.</strong> We will never sell your personal information or user data to third parties. Our business model is not based on advertising or data brokerage.</li>
+                    </ul>
+
+                    <h3>What Data We Collect</h3>
+                    <p>To provide a seamless cross-device experience, we collect and store the following information:</p>
+                    <ul>
+                        <li><strong>Account Information:</strong> When you sign up using Google or Email, we store your unique User ID and email address for authentication purposes.</li>
+                        <li><strong>Encrypted User Data:</strong> We store the characters, settings, and chat history you create. This data is stored in an encrypted format that we cannot decipher.</li>
+                    </ul>
+
+                    <h3>How We Use Your Data</h3>
+                    <ul>
+                        <li><strong>To Provide the Service:</strong> Your account information is used to log you in and sync your encrypted data across your devices.</li>
+                        <li><strong>For Security:</strong> The server-side proxy uses your encrypted API key in-memory for the sole purpose of forwarding your request to the AI provider. It is never logged or stored permanently on our proxy server.</li>
+                    </ul>
+
+                    <h3>Third-Party Services</h3>
+                    <p>Idolon Chat relies on Google's Firebase platform for authentication and cloud database storage. Your interactions with third-party AI providers (like Google Gemini, Groq, etc.) are subject to their respective privacy policies.</p>
+                    
+                    <h3>Your Control & Data Deletion</h3>
+                    <p>You have complete control over your data. You can simply click the "Reset & Erase All Data" button for the permanent deletion of all associated data in your account at any time.</p>
+                </section>
+
+                <section id="terms" class="prose glass-card rounded-xl p-8 lg:p-12">
+                    <h2>Terms & Conditions</h2>
+                    <p><em>Last Updated: [Enter Current Date, e.g., October 26, 2023]</em></p>
+                    
+                    <h3>1. Acceptance of Terms</h3>
+                    <p>By using Idolon Chat (the "Service"), you agree to be bound by these Terms & Conditions and our Privacy Policy.</p>
+
+                    <h3>2. Description of Service</h3>
+                    <p>The Service provides a user interface for you to interact with various third-party AI language models using your own personal API keys. We are an interface, not the AI provider.</p>
+
+                    <h3>3. Your API Keys and Associated Costs</h3>
+                    <p>You are solely responsible for obtaining and securing your own API keys from third-party providers. You acknowledge and agree that you are responsible for any and all costs incurred on your API keys through usage of the Service. We provide a secure environment to use your keys, but we are not responsible for their management or billing.</p>
+                    
+                    <h3>4. User Conduct and Responsibility</h3>
+                    <p>You are solely responsible for the content you generate and the conversations you have using the Service. You agree not to use the Service to generate content that is unlawful, harmful, harassing, or in violation of the terms of service of the underlying AI provider. You also affirm that you have the necessary rights to any content you upload, such as character avatars.</p>
+                    
+                    <h3>5. Age Requirement</h3>
+                    <p>You must be at least 13 years old to use this Service. To use features intended for mature users, such as the "Turn Off Filters" option, you must be at least 18 years old.</p>
+
+                    <h3>6. Disclaimer of Warranty</h3>
+                    <p>The Service is provided "as is," without warranty of any kind. We do not guarantee that the Service will be uninterrupted or error-free, or that the AI-generated content will be accurate or safe.</p>
+
+                    <h3>7. Limitation of Liability</h3>
+                    <p>In no event shall the creators of Idolon Chat be liable for any direct, indirect, or consequential damages arising out of the use or inability to use the Service.</p>
+                </section>
+                
+                <section id="licenses" class="prose glass-card rounded-xl p-8 lg:p-12">
+                    <h2>Third-Party Resources & Licenses</h2>
+                    <p>Idolon Chat is built using fantastic open-source software. We are grateful to the developers and communities who create and maintain these tools.</p>
+                    
+                    <h3>Core Libraries</h3>
+                    <ul>
+                        <li><strong>Firebase SDKs</strong> - Copyright Google LLC, licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a>.</li>
+                        <li><strong>Tailwind CSS</strong> - Copyright Tailwind Labs Inc., licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener">MIT License</a>.</li>
+                        <li><strong>Lucide Icons</strong> - Copyright Lucide Contributors, licensed under the <a href="https://opensource.org/licenses/ISC" target="_blank" rel="noopener">ISC License</a>.</li>
+                        <li><strong>Marked</strong> - Copyright Christopher Jeffrey, licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener">MIT License</a>.</li>
+                        <li><strong>CryptoJS</strong> - Copyright Jeff Mott, licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener">MIT License</a>.</li>
+                    </ul>
+                    
+                    <h3>Fonts</h3>
+                    <ul>
+                        <li><strong>Inter</strong> - Designed by Rasmus Andersson, licensed under the <a href="https://openfontlicense.org/" target="_blank" rel="noopener">SIL Open Font License 1.1</a>.</li>
+                        <li><strong>Roboto</strong> - Designed by Christian Robertson for Google, licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a>.</li>
+                    </ul>
+                </section>
+
+                <section id="self-hosting" class="prose glass-card rounded-xl p-8 lg:p-12">
+                    <h2>Self-Hosting Guide</h2>
+                    <p>This guide provides a comprehensive, step-by-step walkthrough for deploying your own private and secure instance of Idolon Chat. By following these instructions, you will use a free-tier combination of Firebase and Cloudflare to host the application and a secure proxy for your API keys.</p>
+
+                    <h3>Prerequisites</h3>
+                    <p>Before you begin, you will need accounts for:</p>
+                    <ul>
+                        <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a> (to clone the repository)</li>
+                        <li><a href="https://firebase.google.com/" target="_blank" rel="noopener">Google / Firebase</a> (free Spark plan)</li>
+                        <li><a href="https://dash.cloudflare.com/sign-up" target="_blank" rel="noopener">Cloudflare</a> (free plan)</li>
+                    </ul>
+                    <p>You also need these command-line tools installed:</p>
+                    <ul>
+                        <li><a href="https://nodejs.org/" target="_blank" rel="noopener">Node.js and npm</a></li>
+                        <li>Firebase CLI: <code>npm install -g firebase-tools</code></li>
+                        <li>Cloudflare Wrangler CLI: <code>npm install -g wrangler</code></li>
+                    </ul>
+
+                    <h3>Part 1: Firebase Setup (Backend)</h3>
+                    <ol>
+                        <li><span class="step">Create Firebase Project:</span> Go to the <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a> and click <strong>"Add project"</strong>. Name it something like <code>idolon-chat-personal</code>.</li>
+                        <li><span class="step">Create Web App:</span> In the project dashboard, click the Web icon (<code>&lt;/&gt;</code>), register the app, and **copy the `firebaseConfig` object**.</li>
+                        <li><span class="step">Enable Authentication:</span> Go to <span class="path">Build → Authentication → Get Started</span> and enable **Google** and **Email/Password**.</li>
+                        <li><span class="step">Setup Firestore & Rules:</span> Go to <span class="path">Build → Firestore Database → Create database</span>. Start in **production mode**. Then, go to the **Rules** tab, paste in the security rules from the project's `README.md` or `firestore.rules` file, and click **Publish**.</li>
+                    </ol>
+
+                    <h3>Part 2: Cloudflare Worker Setup (Secure Proxy)</h3>
+                    <ol>
+                        <li><span class="step">Create Worker Project:</span> In your terminal, run <code>wrangler init your-proxy-name</code> (e.g., `idolon-api-proxy`). Choose the **"Hello World" Worker** and **JavaScript**.</li>
+                        <li><span class="step">Configure Worker:</span> Navigate into the new folder (<code>cd idolon-api-proxy</code>). Install the crypto dependency: <code>npm install crypto-js</code>. Then, open `package.json` and replace its contents with the configuration provided in the project's `README.md` to enable `node_compat`.</li>
+                        <li><span class="step">Add Worker Code:</span> Open `src/index.js` and replace its contents with the proxy code from the repository. Update the `FIREBASE_PROJECT_ID` and `Access-Control-Allow-Origin` URL to match your Firebase project.</li>
+                        <li><span class="step">Add Firebase Secret Key:</span> In your Firebase project settings under <span class="path">Service Accounts</span>, generate a new private key and download the JSON file. In your terminal, run <code>wrangler secret put FIREBASE_SERVICE_ACCOUNT</code> and paste the content of the JSON file.</li>
+                        <li><span class="step">Deploy Worker:</span> Run <code>wrangler deploy</code>. **Copy the final worker URL** it gives you.</li>
+                    </ol>
+
+                    <h3>Part 3: Frontend Setup & Deployment</h3>
+                    <ol>
+                        <li><span class="step">Clone the Repository:</span> Get the Idolon Chat source code from GitHub.</li>
+                        <li><span class="step">Configure `index.html`:</span> Open the main `index.html` file. Paste your `firebaseConfig` object from Step 1.2 and your worker URL from Step 2.5 into the designated placeholders.</li>
+                        <li><span class="step">Deploy Website:</span> In the root of the project folder, run `firebase init hosting`. Connect it to your existing Firebase project. Set `public` as the public directory. Finally, deploy the site with <code>firebase deploy --only hosting</code>.</li>
+                    </ol>
+                </section>
+            </main>
+
+        </div>
+    </div>
+    
+    <footer class="text-center py-8 px-4">
+        <p class="text-sm text-secondary">
+            &copy; Copyright 2025 Idolon Chat created by 
+            <a href="https://github.com/exanx/idolon" target="_blank" rel="noopener noreferrer" class="font-medium text-link-color hover:text-link-hover-color">EXANX</a>.
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitch = document.getElementById('theme-switch');
+            const backButton = document.getElementById('back-to-app-button');
+
+            // --- Theme Switcher Logic ---
+            const applyTheme = (isDark) => {
+                document.documentElement.dataset.mode = isDark ? 'dark' : 'light';
+                themeSwitch.checked = isDark;
+                localStorage.setItem('idolon-help-theme', isDark ? 'dark' : 'light');
+            };
+
+            const savedTheme = localStorage.getItem('idolon-help-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(savedTheme ? savedTheme === 'dark' : prefersDark);
+
+            themeSwitch.addEventListener('change', () => {
+                applyTheme(themeSwitch.checked);
+            });
+
+            // --- Back to App Button Logic ---
+            if (backButton) {
+                backButton.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (window.opener && !window.opener.closed) {
+                        window.opener.focus();
+                        window.close();
+                    } else {
+                        window.location.href = backButton.href;
+                    }
+                });
+            }
+
+            // --- Scrollspy for Sidebar Navigation ---
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('#help-nav a');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-20% 0px -80% 0px', threshold: 0 });
+
+            sections.forEach(section => observer.observe(section));
+
+            // --- STABLE GLOWING ANIMATION LOGIC ---
+            const glow1 = document.getElementById('glow1');
+            const glow2 = document.getElementById('glow2');
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let targetX1 = mouseX;
+            let targetY1 = mouseY;
+            let targetX2 = mouseX;
+            let targetY2 = mouseY;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            
+            function updateGlows() {
+                targetX1 += (mouseX - targetX1) * 0.05;
+                targetY1 += (mouseY - targetY1) * 0.05;
+                targetX2 += (mouseX - targetX2) * 0.03;
+                targetY2 += (mouseY - targetY2) * 0.03;
+                
+                glow1.style.left = `${targetX1}px`;
+                glow1.style.top = `${targetY1}px`;
+                glow2.style.left = `${targetX2}px`;
+                glow2.style.top = `${targetY2}px`;
+                
+                requestAnimationFrame(updateGlows);
+            }
+            updateGlows();
+        });
+    </script>
+
+</body>
+</html>

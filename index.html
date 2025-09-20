@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Idolon - AI Chat</title>
+    
+    <!-- ADDED FOR PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000137">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="idolon logo" href="favicon.png">
+	<style>
+	
+	/* --- START: Custom Settings Panel Title Color --- */
+    /* Color for Light Mode */
+    html[data-mode="light"] #settings-panel .settings-accordion-header h3.text-theme {
+        color: #1d4ed8; 
+    }
+
+    /* Color for Dark Mode */
+    html[data-mode="dark"] #settings-panel .settings-accordion-header h3.text-theme {
+        color: #60a5fa;
+    }
+    /* --- END: Custom Settings Panel Title Color --- */
+	
+	/* --- START: ADD THIS FOR ACCORDION DROPDOWN FIX --- */
+    .settings-accordion-content.overflow-visible {
+        overflow: visible;
+    }
+    .custom-select-options {
+        max-height: 200px; /* Or whatever height you prefer */
+        overflow-y: auto;
+    }
+    /* --- END: ADD THIS FOR ACCORDION DROPDOWN FIX --- */
+	
+	/* --- START: ADD THIS FOR BLINKING CURSOR --- */
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+    .blinking-cursor {
+        animation: blink 1s step-end infinite;
+    }
+    /* --- END: ADD THIS FOR BLINKING CURSOR --- */
+	
+    <!-- START: ADDED FOR ADVENTURE GAME FEATURE -->
+/* --- START: ADD THIS FOR ADVENTURE GAME UI (REVISED) --- */
+.adventure-intro-container {
+    text-align: center;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.9;
+}
+.adventure-start-button {
+    align-self: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 2.5rem;
+    background-color: #3b82f6; /* Blue-500 */
+    color: white;
+    font-weight: bold;
+    border-radius: 9999px; /* Pill shape */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.adventure-start-button:hover {
+    background-color: #2563eb; /* Blue-600 */
+    transform: scale(1.05);
+}
+.adventure-start-button:disabled {
+    background-color: #9ca3af; /* Gray-400 */
+    cursor: not-allowed;
+    transform: none;
+}
+.adventure-scene {
+    padding: 1rem 0.5rem;
+    color: var(--text-color);
+    font-style: italic;
+    line-height: 1.6;
+    opacity: 0.95;
+}
+.adventure-player-choice {
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    font-weight: 700;
+    text-align: center;
+    color: var(--text-color);
+    font-size: 1.125rem; /* text-lg */
+}
+.adventure-choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; 
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 32rem; 
+    align-self: center;
+}
+.adventure-choice-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    text-align: left;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.adventure-choice-button:hover {
+    background-color: var(--hover-bg);
+    border-color: #3b82f6;
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.adventure-end-text {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.25rem; /* text-xl */
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    background-color: var(--input-bg);
+    border-radius: 0.5rem;
+}
+
+/* --- START: DESKTOP ADVENTURE LAYOUT --- */
+@media (min-width: 768px) {
+    .adventure-choices-container {
+        display: grid; /* Change to grid layout on desktop */
+        grid-template-columns: repeat(2, 1fr); /* Define two equal columns */
+        gap: 0.5rem; /* Slightly reduce the gap */
+        max-width: 40rem; /* Widen the container for the grid */
+    }
+    .adventure-choice-button {
+        font-size: 0.875rem; /* Make the font smaller */
+        padding: 0.6rem 0.8rem; /* Slightly reduce padding */
+    }
+}
+/* --- END: DESKTOP ADVENTURE LAYOUT --- */
+
+	/* --- START: NEW MOBILE PLASMA LAMP ANIMATION --- */
+    @keyframes plasma-move {
+        0%   { transform: translate(0, 0) rotate(0deg) scale(1.2); }
+        25%  { transform: translate(40vw, -30vh) rotate(90deg) scale(1); }
+        50%  { transform: translate(80vw, 60vh) rotate(180deg) scale(1.3); }
+        75%  { transform: translate(10vw, 80vh) rotate(270deg) scale(0.9); }
+        100% { transform: translate(0, 0) rotate(360deg) scale(1.2); }
+    }
+    @media (max-width: 767px) {
+        body[data-theme="theme-idolon"]::before,
+        body[data-theme="theme-idolon"]::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            border-radius: 50%;
+            filter: blur(50px); 
+            display: block; 
+        }
+        body[data-theme="theme-idolon"]::before {
+            width: 60vmin;
+            height: 60vmin;
+            background: #4f46e5; 
+            animation: plasma-move 20s ease-in-out infinite;
+        }
+        body[data-theme="theme-idolon"]::after {
+            width: 45vmin;
+            height: 45vmin;
+            background: #7c3aed; 
+            animation: plasma-move 15s ease-in-out infinite;
+            animation-delay: -8s; 
+        }
+        html[data-mode="light"] body[data-theme="theme-idolon"]::before {
+            background: rgba(79, 70, 229, 0.3); 
+        }
+        html[data-mode="light"] body[data-theme="theme-idolon"]::after {
+            background: rgba(124, 58, 237, 0.25);
+        }
+    }
+    /* --- END: NEW MOBILE PLASMA LAMP ANIMATION --- */
+	
+	/* Custom Scrollbar for ToS Modal */
+    #terms-content::-webkit-scrollbar { width: 6px; }
+    #terms-content::-webkit-scrollbar-track { background: transparent; }
+    #terms-content::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb-color); border-radius: 10px; }
+	
+    /* Hide WhatsApp Camera Button */
+    #whatsapp-camera-button {
+        display: none !important;
+    }
+		
+    /* WhatsApp Icon Alignment Fix */
+    body[data-theme="theme-whatsapp"] #message-form {
+        background-color: var(--input-bg);
+        border-radius: 9999px; /* This makes it a pill shape */
+        padding: 0 0.5rem;      /* Add some horizontal padding */
+    }
+    body[data-theme="theme-whatsapp"] #message-input-wrapper {
+        background-color: transparent; /* Remove the background from the inner div */
+        padding: 0;                    /* Remove its padding */
+    }
+    
+    /* Set correct icon color for the entire input bar in WhatsApp Light Mode */
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] #message-form .icon-theme {
+        color: #54656f;
+    }
+	
+    /* Messenger Light Mode Icon Color Fix */
+    html[data-mode="light"] body[data-theme="theme-messenger"] {
+        --icon-color: #0084ff; /* Messenger blue for icons */
+    }
+    html[data-mode="light"] body[data-theme="theme-messenger"] #send-button .icon-theme {
+        color: #ffffff;
+    }
+		
+    /* Modern Send Button for Idolon Theme */
+    body[data-theme="theme-idolon"] #send-button {
+        background: none !important;
+    }
+    body[data-theme="theme-idolon"] #send-button .icon-theme {
+        color: var(--icon-color);
+    }
+		
+    /* --- Base & Default Theme --- */
+    @keyframes move-bubble {
+        0%   { transform: translate(10vw, -10vh) scale(1); }
+        25%  { transform: translate(80vw, 40vh) scale(1.2); }
+        50%  { transform: translate(40vw, 90vh) scale(0.9); }
+        75%  { transform: translate(15vw, 50vh) scale(1.1); }
+        100% { transform: translate(10vw, -10vh) scale(1); }
+    }
+
+    body[data-theme="theme-idolon"] {
+        --bg-color: #000000; --text-color: #e5e7eb; --header-bg: #111827; --header-text: #e5e7eb;
+        --user-bubble-bg: #3b82f6; --user-bubble-text: #ffffff; --ai-bubble-bg: #1f2937; --ai-bubble-text: #e5e7eb;
+        --input-bg: #1f2937; --input-text: #e5e7eb; --border-color: #374151; --button-bg: #3b82f6; --button-text: #ffffff;
+        --icon-color: #9ca3af; --sidebar-bg: #111827; --sidebar-border: #374151; --hover-bg: rgba(255, 255, 255, 0.05);
+        --active-char-bg: rgba(255, 255, 255, 0.1); --code-bg: #1f2937; --system-bubble-bg: #52525b; --system-bubble-text: #e5e7eb;
+        --scrollbar-thumb-color: #4b5563;
+        position: relative; background-color: #000000; overflow: hidden;
+    }
+		
+    /* Light Mode for Idolon Theme */
+    html[data-mode="light"] body[data-theme="theme-idolon"] {
+        --bg-color: #f9fafb; --text-color: #1f2937; --header-bg: #ffffff; --header-text: #1f2937;
+        --user-bubble-bg: #3b82f6; --user-bubble-text: #ffffff; --ai-bubble-bg: #e5e7eb; --ai-bubble-text: #1f2937;
+        --input-bg: #f3f4f6; --input-text: #1f2937; --border-color: #e5e7eb; --button-bg: #3b82f6; --button-text: #ffffff;
+        --icon-color: #6b7280; --sidebar-bg: #f9fafb; --sidebar-border: #e5e7eb; --hover-bg: rgba(0, 0, 0, 0.05);
+        --active-char-bg: rgba(0, 0, 0, 0.07); --code-bg: #f3f4f6; --system-bubble-bg: #a1a1aa; --system-bubble-text: #ffffff;
+        --scrollbar-thumb-color: #d1d5db;
+        background-color: var(--bg-color);
+    }
+
+    /* Idolon Animated Background Bubbles */
+    html[data-mode="light"] body[data-theme="theme-idolon"]::before {
+        background-image: radial-gradient(circle, rgba(0, 1, 55, 0.1) 0%, rgba(67, 56, 202, 0) 70%);
+        filter: blur(60px); animation: move-bubble 18s ease-in-out infinite;
+    }
+    body[data-theme="theme-idolon"]::before {
+        content: ''; position: absolute; z-index: -1; top: 0; left: 0; width: 35vmax; height: 35vmax; border-radius: 50%;
+        background-image: radial-gradient(circle, #000137 0%, rgba(67, 56, 202, 0) 70%);
+        filter: blur(60px); animation: move-bubble 18s ease-in-out infinite;
+    }
+    body[data-theme="theme-idolon"] #app-container { background-color: transparent; }
+    body[data-theme="theme-idolon"] #message-input-wrapper { background-color: var(--input-bg); }
+		
+    :root {
+        --bg-color: #ffffff; --text-color: #1f2937; --header-bg: #f9fafb; --header-text: #1f2937;
+        --user-bubble-bg: #3b82f6; --user-bubble-text: #ffffff; --ai-bubble-bg: #e5e7eb; --ai-bubble-text: #1f2937;
+        --input-bg: #f3f4f6; --input-text: #1f2937; --border-color: #e5e7eb; --button-bg: #3b82f6; --button-text: #ffffff;
+        --icon-color: #6b7280; --font-family: 'Inter', sans-serif; --sidebar-bg: #f9fafb; --sidebar-border: #e5e7eb;
+        --hover-bg: rgba(0, 0, 0, 0.05); --active-char-bg: rgba(0, 0, 0, 0.07); --code-bg: #f3f4f6;
+        --system-bubble-bg: #a1a1aa; --system-bubble-text: #ffffff; --scrollbar-thumb-color: #d1d5db;
+    }
+    html, body { height: 100%; width: 100%; overflow: hidden; }
+    html[data-mode="dark"] {
+        --bg-color: #111827; --text-color: #e5e7eb; --header-bg: #1f2937; --header-text: #e5e7eb;
+        --user-bubble-bg: #3b82f6; --ai-bubble-bg: #374151; --ai-bubble-text: #e5e7eb; --input-bg: #1f2937;
+        --input-text: #e5e7eb; --border-color: #374151; --icon-color: #9ca3af; --sidebar-bg: #1f2937; --sidebar-border: #374151;
+        --hover-bg: rgba(255, 255, 255, 0.05); --active-char-bg: rgba(255, 255, 255, 0.1); --code-bg: #1f2937;
+        --system-bubble-bg: #52525b; --system-bubble-text: #e5e7eb; --scrollbar-thumb-color: #4b5563;
+    }
+    body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
+    .bg-theme { background-color: var(--bg-color); } .text-theme { color: var(--text-color); }
+    .bg-header { background-color: var(--header-bg); } .text-header { color: var(--header-text); }
+    .border-theme { border-color: var(--border-color); } .user-bubble { background: var(--user-bubble-bg); color: var(--user-bubble-text); }
+    .ai-bubble { background: var(--ai-bubble-bg); color: var(--ai-bubble-text); } .system-bubble { background-color: var(--system-bubble-bg); color: var(--system-bubble-text); }
+    .bg-input { background-color: var(--input-bg); } .text-input { color: var(--input-text); }
+    .bg-button { background-color: var(--button-bg); } .text-button { color: var(--button-text); }
+    .icon-theme { color: var(--icon-color); } .bg-sidebar { background-color: var(--sidebar-bg); }
+    .border-sidebar { border-color: var(--sidebar-border); } .hover-theme:hover { background-color: var(--hover-bg); }
+    .character-item.active { background-color: var(--active-char-bg); }
+
+    /* Theme-Specific Styling */
+    .theme-icon { display: none; }
+    body[data-theme="theme-idolon"] .icon-idolon, body[data-theme="theme-imessage"] .icon-imessage,
+    body[data-theme="theme-whatsapp"] .icon-whatsapp, body[data-theme="theme-messenger"] .icon-messenger,
+    body[data-theme="theme-instagram"] .icon-instagram, body[data-theme="theme-twitter"] .icon-twitter { display: inline-flex; }
+    #message-input-wrapper { border-radius: 9999px; }
+		
+    /* Idolon Icon Fix */
+    body[data-theme="theme-idolon"] #image-upload-button .icon-idolon { display: inline-flex; }
+    body[data-theme="theme-idolon"] #image-upload-button .icon-theme, html[data-mode="light"] body[data-theme="theme-idolon"] #image-upload-button .icon-theme { color: var(--icon-color); }
+		
+    /* iMessage */
+    body[data-theme="theme-imessage"] { --user-bubble-bg: #007aff; --ai-bubble-bg: #e5e5ea; --ai-bubble-text: #000; --button-bg: #007aff; --input-bg: #ffffff; --border-color: #dcdcdc; --sidebar-bg: #f2f2f7;}
+    html[data-mode="dark"] body[data-theme="theme-imessage"] { --bg-color: #000000; --header-bg: #1c1c1e; --user-bubble-bg: #0b84ff; --ai-bubble-bg: #2c2c2e; --ai-bubble-text: #ffffff; --input-bg: #2c2c2e; --border-color: #2c2c2e; --sidebar-bg: #1c1c1e;}
+    body[data-theme="theme-imessage"] #message-input-wrapper { border-radius: 0.75rem; }
+
+    /* WhatsApp Theme */
+    body[data-theme="theme-whatsapp"] {
+        --font-family: 'Roboto', sans-serif; --bg-color: #f5f1eb; --header-bg: #ffffff; --header-text: #000000; --user-bubble-bg: #d9fdd3;
+        --user-bubble-text: #000000; --ai-bubble-bg: #ffffff; --ai-bubble-text: #000000; --button-bg: #00A884; --input-bg: #FFFFFF;
+        --sidebar-bg: #ffffff; --sidebar-border: #e0e0e0; background-image: none;
+    }
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] { --icon-color: #54656f; }
+    body[data-theme="theme-whatsapp"] #app-container { background-color: var(--bg-color); }
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] #chat-header .icon-theme { color: #54656f; }
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar, html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar .text-theme,
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar .icon-theme { color: #000000; }
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar .character-item.active { background-color: rgba(255, 255, 255, 0.15); }
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar .hover-theme:hover { background-color: rgba(255, 255, 255, 0.1); }
+    html[data-mode="dark"] body[data-theme="theme-whatsapp"] {
+        --bg-color: #0b141a; --header-bg: #202c33; --header-text: #e7e9ea; --icon-color: #aebac1; --user-bubble-bg: #005c4b;
+        --user-bubble-text: #FFFFFF; --ai-bubble-bg: #202c33; --ai-bubble-text: #e7e9ea; --button-bg: #00a884; --sidebar-bg: #111b21;
+        --sidebar-border: #2f3336; --input-bg: #202c33; background-image: none;
+    }
+    
+    /* Other Themes (Messenger, Instagram, Twitter) */
+    body[data-theme="theme-messenger"] { --user-bubble-bg: linear-gradient(to top right, #00c6ff, #0072ff); --ai-bubble-bg: #e4e6eb; --ai-bubble-text: #050505; --button-bg: #0084ff; --sidebar-bg: #fff; --input-bg: #f0f2f5;}
+    html[data-mode="light"] body[data-theme="theme-messenger"] { --icon-color: #0084ff; }
+    html[data-mode="dark"] body[data-theme="theme-messenger"] { --bg-color: #18191a; --header-bg: #242526; --user-bubble-bg: linear-gradient(to top right, #00c6ff, #0072ff); --ai-bubble-bg: #3a3b3c; --ai-bubble-text: #e4e6eb; --sidebar-bg: #242526; --input-bg: #3a3b3c; --border-color: #3a3b3c; --icon-color: #0084ff; }
+    body[data-theme="theme-instagram"] { --user-bubble-bg: #efefef; --user-bubble-text: #000; --ai-bubble-bg: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045); --ai-bubble-text: #fff; --sidebar-bg: #fff; --input-bg: #fff; --border-color: #dbdbdb;}
+    html[data-mode="dark"] body[data-theme="theme-instagram"] { --bg-color: #000; --header-bg: #000; --user-bubble-bg: #262626; --user-bubble-text: #fff; --sidebar-bg: #000; --input-bg: #262626; --border-color: #363636;}
+    body[data-theme="theme-twitter"] { --bg-color: #fff; --text-color: #0f1419; --header-bg: #fff; --user-bubble-bg: #1d9bf0; --ai-bubble-bg: #f7f9f9; --ai-bubble-text: #0f1419; --sidebar-bg: #fff; --input-bg: #eff3f4; --border-color: #eff3f4; --button-bg: #1d9bf0;}
+    html[data-mode="dark"] body[data-theme="theme-twitter"] { --bg-color: #000; --text-color: #e7e9ea; --header-bg: #000; --border-color: #2f3336; --input-bg: #202327; --user-bubble-bg: #1d9bf0; --ai-bubble-bg: #202327; --ai-bubble-text: #e7e9ea; --sidebar-bg: #000;}
+
+    /* Layout & Responsiveness */
+    #chat-container { position: relative; }
+    #chat-footer { position: sticky; bottom: 0; }
+    #character-modal { max-height: 90vh; }
+    #message-input { resize: none; overflow-y: auto; max-height: 5rem; }
+    @media (max-width: 767px) {
+        #chat-container { display: flex; flex-direction: column; height: 100vh; height: 100svh; }
+        #message-area { flex: 1; min-height: 0; }
+        #chat-footer { z-index: 10; }
+        #settings-panel { max-width: none; width: 100vw; }
+        #character-modal { top: 0; left: 0; width: 100vw; height: 100vh; height: 100svh; max-width: none; max-height: none; transform: none; border-radius: 0; }
+    }
+
+    /* Custom scrollbar */
+    #message-area::-webkit-scrollbar, #settings-panel-content::-webkit-scrollbar, #sidebar-content::-webkit-scrollbar, #character-modal-content::-webkit-scrollbar, #group-participant-list::-webkit-scrollbar, #popdown-details-content::-webkit-scrollbar, .custom-select-options::-webkit-scrollbar, #message-input::-webkit-scrollbar { width: 6px; }
+    #message-area::-webkit-scrollbar-track, #settings-panel-content::-webkit-scrollbar-track, #sidebar-content::-webkit-scrollbar-track, #character-modal-content::-webkit-scrollbar-track, #group-participant-list::-webkit-scrollbar-track, #popdown-details-content::-webkit-scrollbar-track, .custom-select-options::-webkit-scrollbar-track, #message-input::-webkit-scrollbar-track { background: transparent; }
+    #message-area::-webkit-scrollbar-thumb, #settings-panel-content::-webkit-scrollbar-thumb, #sidebar-content::-webkit-scrollbar-thumb, #character-modal-content::-webkit-scrollbar-thumb, #group-participant-list::-webkit-scrollbar-thumb, #popdown-details-content::-webkit-scrollbar-thumb, .custom-select-options::-webkit-scrollbar-thumb, #message-input::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb-color); border-radius: 10px; }
+
+    /* Markdown Styles */
+    .message-bubble p { margin-bottom: 0.5rem; } .message-bubble p:last-child { margin-bottom: 0; }
+    .message-bubble ul, .message-bubble ol { margin-left: 1.25rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+    .message-bubble li { margin-bottom: 0.25rem; }
+    .message-bubble pre { background-color: var(--code-bg); padding: 0.75rem; border-radius: 0.5rem; margin: 0.5rem 0; white-space: pre-wrap; word-break: break-all; }
+    .message-bubble code { font-family: monospace; } .message-bubble pre code { background: none; padding: 0; }
+    .message-bubble > *:not(:last-child) { margin-bottom: 0.5rem; }
+    .message-bubble img { max-width: 16rem; height: auto; border-radius: 0.75rem; display: block; }
+    .image-bubble { padding: 6px; border-radius: 1.125rem; background-color: var(--border-color); }
+
+    .hide-chat-avatars .user-avatar, .hide-chat-avatars .ai-avatar { display: none; }
+    .hide-chat-avatars .group-ai-message .ai-avatar { display: block !important; }
+
+    /* --- UX CHANGE: Message actions on hover/long-press --- */
+    .message-actions-menu { min-width: 120px; }
+    .message-container:not(:hover) .message-actions-trigger { display: none; }
+    @media (max-width: 767px) {
+        .message-actions-trigger { display: none !important; }
+    }
+    
+    .message-timestamp { font-size: 0.65rem; color: #9ca3af; white-space: nowrap; margin-top: 0.25rem; }
+    html[data-mode="dark"] .message-timestamp { color: #6b7280; }
+
+    /* Custom Select */
+    .custom-select-container { position: relative; }
+    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.375rem; background-color: var(--input-bg); color: var(--input-text); cursor: pointer; transition: border-color 0.2s; }
+    .custom-select-trigger:focus, .custom-select-trigger.open { outline: 2px solid transparent; outline-offset: 2px; border-color: #3b82f6; }
+    .custom-select-options { position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.25rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); z-index: 50; opacity: 0; transform: scale(0.95); transition: opacity 0.1s ease-out, transform 0.1s ease-out; pointer-events: none; }
+    .custom-select-options.open { opacity: 1; transform: scale(1); pointer-events: auto; }
+    .custom-select-option { padding: 0.5rem 0.75rem; cursor: pointer; } .custom-select-option:hover { background-color: var(--hover-bg); }
+    .custom-select-option.selected { background-color: var(--active-char-bg); font-weight: 500; }
+    
+    /* --- UX CHANGE: Settings Accordion --- */
+    .settings-accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+
+    @keyframes typing-bubble { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+    .typing-dot { animation: typing-bubble 1.4s infinite ease-in-out both; }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    #typing-indicator-container { position: absolute; bottom: 5rem; left: 1rem; z-index: 5; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+    #typing-indicator-container.hidden { opacity: 0; transform: translateY(10px); pointer-events: none; }
+    @media (min-width: 768px) { #typing-indicator-container { bottom: 5.5rem; } }
+
+    #app-container.loaded { opacity: 1; }
+    #character-details-popdown { position: absolute; top: 4rem; left: 1rem; right: 1rem; z-index: 25; }
+    @media (min-width: 768px) { #character-details-popdown { left: auto; right: 1rem; } }
+    #character-details-overlay { position: absolute; }
+    #chat-loading-bar-container { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background-color: transparent; z-index: 20; opacity: 0; transition: opacity 0.3s ease-in-out; }
+    #chat-loading-bar-container.visible { opacity: 1; }
+    #chat-loading-bar { width: 0%; height: 100%; background-color: #3b82f6; }
+        
+	/* Revamped Chat Footer */
+	#chat-footer { padding: 0.5rem; background-color: var(--header-bg); transition: background-color 0.3s; border-top: 1px solid var(--border-color); }
+    html[data-mode="light"] #chat-footer { background-color: var(--bg-color); border-color: var(--border-color); }
+    html[data-mode="light"] body[data-theme="theme-idolon"] #chat-footer, html[data-mode="light"] body[data-theme="theme-whatsapp"] #chat-footer { background-color: var(--header-bg); border-color: transparent; }
+	#message-form { display: flex; align-items: flex-end; gap: 0.5rem; }
+	#message-input-wrapper { flex-grow: 1; display: flex; align-items: center; min-height: 44px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 9999px; transition: background-color 0.3s, border-color 0.3s; }
+    html[data-mode="dark"] #message-input-wrapper { border-color: transparent; }
+	#message-input { flex-grow: 1; padding: 0.5rem; line-height: 1.5; border: none; background: transparent; color: var(--input-text); }
+	#message-input:focus { outline: none; }
+	.footer-button { flex-shrink: 0; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s; border: none; background: none; padding: 0; }
+	.footer-button .icon-theme, .footer-button svg { width: 24px; height: 24px; }
+    .footer-button:not(#send-button) .icon-theme { color: var(--icon-color); }
+    .input-action-button { flex-shrink: 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: none; background: none; padding: 0 0.5rem; border-radius: 9999px; }
+    .input-action-button .icon-theme, .input-action-button svg { width: 24px; height: 24px; color: var(--icon-color); }
+    #send-button { background: none !important; }
+    body[data-theme="theme-idolon"] #send-button .icon-theme, body[data-theme="theme-twitter"] #send-button .icon-theme { color: var(--icon-color); }
+    body[data-theme="theme-imessage"] #send-button .icon-theme, body[data-theme="theme-messenger"] #send-button .icon-theme { color: var(--button-bg); }
+    html[data-mode="dark"] body[data-theme="theme-imessage"] #send-button .icon-theme, html[data-mode="dark"] body[data-theme="theme-messenger"] #send-button .icon-theme { color: var(--user-bubble-bg); }
+    body[data-theme="theme-whatsapp"] #send-button .icon-theme { color: var(--button-bg); }
+    body[data-theme="theme-instagram"] #send-button { width: auto; color: #0095f6; }
+    html[data-mode="dark"] body[data-theme="theme-instagram"] #send-button { color: #0095f6; }
+    body[data-theme="theme-imessage"] #message-input-wrapper { border-radius: 1.25rem; }
+    html[data-mode="light"] body[data-theme="theme-imessage"] #message-input-wrapper { background-color: #FFFFFF; border-color: #E5E5E5; }
+    body[data-theme="theme-whatsapp"] #message-form { background-color: var(--input-bg); border-radius: 9999px; padding: 0 0.5rem; }
+    body[data-theme="theme-whatsapp"] #message-input-wrapper { background-color: transparent; border: none; padding: 0; }
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] #chat-footer .footer-button:not(#send-button) .icon-theme { color: #54656f; }
+    html[data-mode="light"] body[data-theme="theme-whatsapp"] .input-action-button .icon-theme { color: #54656f; }
+    body[data-theme="theme-instagram"] #message-input-wrapper { border: 1px solid var(--border-color); }
+    html[data-mode="light"] #email-signin-toggle-button { background-color: #f3f4f6; border-color: #e5e7eb; }
+    html[data-mode="light"] #email-signin-toggle-button:hover { background-color: #e5e7eb; }
+    </style>
+</head>
+<body data-theme="theme-imessage">
+
+    <div id="loading-overlay" class="fixed inset-0 bg-theme z-[100] flex flex-col items-center justify-center gap-4 transition-opacity duration-500 hidden">
+        <img src="favicon.svg" alt="Idolon Chat Logo" class="w-16 h-16 animate-pulse">
+        <div class="text-2xl font-bold text-theme">Idolon</div>
+        <div class="w-1/2 max-w-xs bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+            <div id="loading-bar" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300 ease-linear" style="width: 10%"></div>
+        </div>
+    </div>
+
+    <div id="app-container" class="flex h-screen w-screen bg-theme opacity-0 transition-opacity duration-500">
+        <!-- Sidebar -->
+        <div id="sidebar" class="absolute md:relative z-30 h-full w-full md:w-1/3 lg:w-1/4 bg-sidebar border-r border-sidebar md:flex md:flex-col grid grid-rows-[auto_auto_1fr] -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+            <header class="p-4 border-b border-sidebar flex justify-between items-center flex-shrink-0 h-14">
+                <h1 class="text-lg font-bold text-theme">Chats</h1>
+                <div class="flex items-center gap-2">
+                    <button id="add-character-button" title="Add New Character" class="p-2 rounded-full hover-theme">
+                        <svg data-lucide="user-plus" class="icon-theme h-5 w-5"></svg>
+                    </button>
+                    <button id="add-group-button" title="Add New Group" class="p-2 rounded-full hover-theme">
+                        <svg data-lucide="users" class="icon-theme h-5 w-5"></svg>
+                    </button>
+                    <button id="close-sidebar-button" class="p-2 rounded-full hover-theme md:hidden">
+                        <svg data-lucide="x" class="icon-theme h-5 w-5"></svg>
+                    </button>
+                </div>
+            </header>
+            
+            <div id="sidebar-content" class="overflow-y-auto p-2">
+                <div id="character-list" class="space-y-1"></div>
+            </div>
+        </div>
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-20 z-20 hidden"></div>
+
+        <!-- Main Chat Area -->
+        <div id="chat-container" class="flex flex-col h-full flex-1">
+            <header id="chat-header" class="flex items-center justify-between p-2 md:p-3 border-b border-theme bg-header shadow-sm flex-shrink-0 h-14 relative">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button id="show-sidebar-button" class="p-2 rounded-full hover-theme md:hidden">
+                        <svg data-lucide="menu" class="icon-theme h-5 w-5"></svg>
+                    </button>
+                    <div id="header-avatar-stack" class="flex items-center -space-x-4 cursor-pointer">
+                         <img id="header-avatar" src="" class="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover border-2 border-white dark:border-gray-800">
+                    </div>
+                    <div class="min-w-0">
+                        <h1 id="header-name" class="font-bold text-md text-header truncate"></h1>
+                        <p id="header-status" class="text-xs opacity-80 text-header">Online</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <div class="relative">
+                        <button id="header-menu-button" title="More Options" class="p-2 rounded-full hover-theme">
+                            <svg data-lucide="more-vertical" class="icon-theme h-5 w-5"></svg>
+                        </button>
+                        <div id="header-menu-dropdown" class="hidden absolute top-full right-0 mt-2 w-64 bg-sidebar border border-theme rounded-md shadow-lg z-10">
+                            <button id="download-chat-menu-item" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-theme hover-theme">
+                                <svg data-lucide="download" class="h-4 w-4"></svg>
+                                <span>Download Character & Chat</span>
+                            </button>
+                            <div class="border-t border-theme mx-2"></div>
+                            <button id="clear-local-chat-menu-item" class="w-full text-left flex flex-col items-start gap-0 px-4 py-2 text-sm text-theme hover-theme">
+                                <span class="flex items-center gap-3 font-medium"><svg data-lucide="brush" class="h-4 w-4"></svg> Clear Local History</span>
+                                <span class="text-xs opacity-60 pl-7">Resyncs this chat from the cloud.</span>
+                            </button>
+                             <button id="clear-cloud-chat-menu-item" class="w-full text-left flex flex-col items-start gap-0 px-4 py-2 text-sm text-red-500 hover-theme">
+                                <span class="flex items-center gap-3 font-medium"><svg data-lucide="cloud-off" class="h-4 w-4"></svg> Delete Cloud History</span>
+                                <span class="text-xs opacity-60 pl-7">Permanently deletes this chat from cloud.</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button id="settings-button-main" title="Settings" class="p-2 rounded-full hover-theme">
+                        <svg data-lucide="settings" class="icon-theme h-5 w-5"></svg>
+                    </button>
+                </div>
+
+                <div id="chat-loading-bar-container" class="">
+                    <div id="chat-loading-bar"></div>
+                </div>
+            </header>
+
+            <div id="api-setup-banner" class="hidden p-3 bg-yellow-100 dark:bg-yellow-900 border-b border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 text-center text-sm">
+                👋 Welcome to Idolon! To start chatting, add your API key in 
+                <button id="settings-button-in-banner" class="font-bold underline hover:text-yellow-600 dark:hover:text-yellow-100">Settings</button>.
+            </div>
+
+            <main id="message-area" class="flex flex-col flex-1 px-4 pt-4 pb-16 overflow-y-auto"></main>
+			
+            <div id="image-generation-loader" class="hidden px-4 mb-2">
+                <div class="flex items-end gap-2 max-w-full overflow-hidden">
+                    <img id="image-loader-avatar" class="ai-avatar w-8 h-8 rounded-full object-cover flex-shrink-0" src="">
+                    <div class="ai-bubble flex items-center justify-center gap-2 p-3 rounded-2xl rounded-bl-lg">
+                        <svg class="animate-spin h-5 w-5 icon-theme" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                        <span class="text-sm">Creating image...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="typing-indicator-container" class="hidden">
+                <div class="flex items-center gap-2">
+                    <div id="typing-avatar-container" class="flex-shrink-0"></div>
+                    <div class="ai-bubble flex items-center justify-center gap-1.5 p-3 rounded-2xl rounded-bl-lg">
+                        <span class="typing-dot w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full"></span>
+                        <span class="typing-dot w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full"></span>
+                        <span class="typing-dot w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="character-details-overlay" class="fixed inset-0 z-20 hidden"></div>
+            <div id="character-details-popdown" class="w-auto max-w-none md:w-full md:max-w-sm bg-theme border border-theme rounded-lg shadow-xl p-4 hidden transform transition-all duration-200 ease-in-out opacity-0 scale-95 origin-top md:origin-top-right">
+                <div class="flex items-center gap-4">
+                    <img id="popdown-avatar" class="w-20 h-20 rounded-full object-cover flex-shrink-0 bg-gray-200 dark:bg-gray-700">
+                    <div class="flex-1 min-w-0">
+                        <h3 id="popdown-name" class="text-xl font-bold text-theme truncate"></h3>
+                    </div>
+                </div>
+                <div id="popdown-details-content" class="mt-4 text-sm text-theme opacity-90 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                </div>
+            </div>
+
+            <footer id="chat-footer" class="border-t border-theme">
+                <div id="image-preview-wrapper" class="hidden mb-2 relative w-24 h-24">
+                    <img id="image-preview" class="w-full h-full object-cover rounded-md">
+                    <button id="remove-image-button" type="button" class="absolute -top-2 -right-2 bg-gray-700 text-white rounded-full p-1">
+                        <svg data-lucide="x" class="h-3 w-3"></svg>
+                    </button>
+                </div>
+                <div id="guidance-wrapper" class="hidden mb-2">
+                    <div class="flex items-center gap-2 text-sm text-theme opacity-80 mb-1">
+                        <svg data-lucide="sparkles" class="h-4 w-4"></svg>
+                        <span>Guide the next AI response...</span>
+                    </div>
+                    <input id="guidance-input" type="text" placeholder="e.g., Explain it like I'm five years old." class="w-full p-2 border border-theme rounded-md bg-input text-input">
+                </div>
+                <form id="message-form">
+                   <div id="message-input-wrapper">
+                        <button type="button" id="guidance-button" title="Guide AI Response" class="input-action-button hover-theme">
+                            <svg data-lucide="sparkles" class="icon-theme"></svg>
+                        </button>
+                        <button type="button" id="image-upload-button" class="input-action-button hover-theme">
+                             <span class="theme-icon icon-idolon"><svg data-lucide="paperclip" class="icon-theme"></svg></span>
+                             <span class="theme-icon icon-imessage"><svg data-lucide="camera" class="icon-theme"></svg></span>
+                             <span class="theme-icon icon-instagram"><svg data-lucide="camera" class="icon-theme"></svg></span>
+                             <span class="theme-icon icon-messenger"><svg data-lucide="image" class="icon-theme"></svg></span>
+                             <span class="theme-icon icon-twitter"><svg data-lucide="image" class="icon-theme"></svg></span>
+                             <span class="theme-icon icon-whatsapp"><svg data-lucide="paperclip" class="icon-theme"></svg></span>
+                        </button>
+                        <textarea id="message-input" rows="1" placeholder="Type a message..." class="bg-transparent focus:outline-none" autocomplete="off"></textarea>
+                        <button type="button" id="whatsapp-camera-button" class="theme-icon icon-whatsapp p-2 -mr-2 hover-theme"><svg data-lucide="camera" class="icon-theme"></svg></button>
+                    </div>
+                    <button id="send-button" type="submit" class="footer-button hidden">
+                        <div id="theme-icons-container">
+                            <span class="theme-icon icon-idolon"><svg data-lucide="send-horizontal" class="icon-theme"></svg></span>
+                            <span class="theme-icon icon-imessage"><svg data-lucide="send-horizontal" class="icon-theme"></svg></span>
+                            <span class="theme-icon icon-whatsapp"><svg data-lucide="send-horizontal" class="icon-theme"></svg></span>
+                            <span class="theme-icon icon-messenger"><svg data-lucide="send-horizontal" class="icon-theme"></svg></span>
+                            <span class="theme-icon icon-instagram font-semibold text-sm">Send</span>
+                            <span class="theme-icon icon-twitter"><svg data-lucide="send-horizontal" class="icon-theme"></svg></span>
+                        </div>
+                    </button>
+                </form>
+            </footer>
+        </div>
+
+        <!-- Settings Panel -->
+        <div id="settings-panel-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+        <div id="settings-panel" class="fixed top-0 right-0 h-full w-full max-w-sm transform translate-x-full transition-transform duration-300 ease-in-out shadow-lg z-50 flex flex-col bg-theme">
+            <header class="flex items-center justify-between p-4 border-b border-theme">
+                <h2 class="text-xl font-bold text-theme">Settings</h2>
+                <div class="flex items-center gap-1">
+                    <a href="help.html" target="_top" title="Help" class="p-2 rounded-full hover-theme">
+                        <svg data-lucide="help-circle" class="icon-theme h-5 w-5"></svg>
+                    </a>
+                    <button id="close-settings-button" class="p-2 rounded-full hover-theme">
+                        <svg data-lucide="x" class="icon-theme h-5 w-5"></svg>
+                    </button>
+                </div>
+            </header>
+            
+            <div id="settings-panel-content" class="flex-1 p-4 md:p-6 overflow-y-auto">
+
+                <!-- START: NEW UNIFIED ACCOUNT & PREMIUM SECTION -->
+                <div class="p-4 mb-4 border border-theme rounded-lg bg-input/50">
+                    <h3 class="font-semibold text-theme text-lg mb-3">Account & Subscription</h3>
+            
+                    <!-- Signed Out View -->
+                    <div id="account-info-signed-out" class="space-y-3">
+                        <p class="text-sm text-center text-theme opacity-80">Sign in for cloud backup & premium features like real-time sync and secure API proxy.</p>
+                        <div class="space-y-3">
+                            <button id="google-signin-button" class="w-full flex items-center justify-center gap-3 bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.021 35.596 44 30.138 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
+                                <span>Sign in with Google</span>
+                            </button>
+                            <button id="email-signin-toggle-button" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-700 border border-theme py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-opacity text-theme">
+                                <svg data-lucide="mail" class="icon-theme h-4 w-4"></svg>
+                                <span>Sign in with Email</span>
+                            </button>
+                            <div id="email-auth-container" class="hidden">
+                                <div class="relative flex py-2 items-center"><div class="flex-grow border-t border-theme"></div><span class="flex-shrink mx-4 text-xs text-gray-400">Enter Your Email & Password</span><div class="flex-grow border-t border-theme"></div></div>
+                                <form id="email-auth-form" class="space-y-3">
+                                    <div><label for="email-input" class="block text-sm font-medium mb-1 text-theme">Email</label><input type="email" id="email-input" required class="w-full p-2 border border-theme rounded-md bg-input text-input" autocomplete="email"></div>
+                                    <div><label for="password-input" class="block text-sm font-medium mb-1 text-theme">Password</label><input type="password" id="password-input" required class="w-full p-2 border border-theme rounded-md bg-input text-input" autocomplete="current-password"></div>
+                                    <button id="email-auth-button" type="submit" class="w-full bg-gray-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors">Sign In</button>
+                                </form>
+                                <p class="text-center text-sm text-theme"><span id="auth-mode-message">Don't have an account?</span><button id="auth-mode-toggle" type="button" class="font-semibold text-blue-500 hover:underline">Sign Up</button></p>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <!-- Free User View -->
+                    <div id="account-view-free" class="hidden space-y-3">
+                        <div id="user-info-free" class="text-center"></div>
+                        <div class="text-center text-sm bg-theme p-2 rounded-md border border-theme">
+                            <p><strong>Free Plan</strong></p>
+                            <p id="last-backup-info" class="text-xs opacity-70">Last backup: Never</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="upgrade-button" class="flex-grow flex items-center justify-center gap-2 bg-purple-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                                <svg data-lucide="gem" class="h-4 w-4"></svg> Upgrade to Premium
+                            </button>
+                            <button id="sign-out-button-free" title="Sign Out" class="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                                <svg data-lucide="log-out" class="h-5 w-5"></svg>
+                            </button>
+                        </div>
+                    </div>
+            
+                    <!-- Premium User View -->
+                    <div id="account-view-premium" class="hidden space-y-3">
+                         <div id="user-info-premium" class="text-center"></div>
+                         <div class="text-center text-sm bg-green-100 dark:bg-green-900/50 p-2 rounded-md border border-green-200 dark:border-green-800">
+                            <p class="font-bold text-green-800 dark:text-green-200 flex items-center justify-center gap-2"><svg data-lucide="check-circle" class="h-4 w-4"></svg>Premium Active</p>
+                            <p class="text-xs text-green-700 dark:text-green-300">Real-time sync is enabled.</p>
+                        </div>
+                         <div class="flex items-center gap-2">
+                            <button id="manage-subscription-button" class="flex-grow bg-blue-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors">Manage Subscription</button>
+                            <button id="sign-out-button-premium" title="Sign Out" class="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                                <svg data-lucide="log-out" class="h-5 w-5"></svg>
+                            </button>
+                         </div>
+                    </div>
+            
+                </div>
+                <!-- END: NEW UNIFIED ACCOUNT & PREMIUM SECTION -->
+
+                <div class="space-y-2 border-t border-theme pt-2">
+                    <div>
+                        <button class="settings-accordion-header w-full flex justify-between items-center py-2">
+                            <h3 class="font-semibold text-theme">Appearance</h3>
+                            <svg data-lucide="chevron-down" class="accordion-icon icon-theme h-5 w-5 transition-transform"></svg>
+                        </button>
+                        <div class="settings-accordion-content overflow-hidden">
+                            <div class="pt-2 pb-4 space-y-4">
+                                <div class="flex items-center justify-between"><label for="theme-switch" class="text-sm font-medium text-theme">Dark Mode</label><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="theme-switch" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div></label></div>
+                                <div class="flex items-center justify-between"><label for="show-avatars-switch" class="text-sm font-medium text-theme">Show Avatars in Chat</label><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="show-avatars-switch" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div></label></div>
+                                <div><label for="theme-select" class="block text-sm font-medium mb-1 text-theme">Interface Style</label><select id="theme-select"><option value="theme-idolon">Idolon (Default)</option><option value="theme-imessage">I Chat</option><option value="theme-whatsapp">What's Up?</option><option value="theme-messenger">Message Me</option><option value="theme-instagram">Instant Pic</option><option value="theme-twitter">X Bird</option></select></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="settings-accordion-header w-full flex justify-between items-center py-2">
+                            <h3 class="font-semibold text-theme">Your Character</h3>
+                            <svg data-lucide="chevron-down" class="accordion-icon icon-theme h-5 w-5 transition-transform"></svg>
+                        </button>
+                        <div class="settings-accordion-content overflow-hidden">
+                            <div class="pt-2 pb-4 space-y-4">
+                                <div class="flex items-center gap-4"><img id="user-avatar-preview" class="w-16 h-16 rounded-full object-cover cursor-pointer bg-gray-200 dark:bg-gray-700"><div class="flex-1"><label for="user-name-input" class="block text-sm font-medium mb-1 text-theme">Your Name</label><input type="text" id="user-name-input" class="w-full p-2 border border-theme rounded-md bg-input text-input"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button class="settings-accordion-header w-full flex justify-between items-center py-2">
+                            <h3 class="font-semibold text-theme">Time Settings</h3>
+                            <svg data-lucide="chevron-down" class="accordion-icon icon-theme h-5 w-5 transition-transform"></svg>
+                        </button>
+                        <div class="settings-accordion-content overflow-hidden">
+                            <div class="pt-2 pb-4 space-y-4">
+                                 <div><label for="time-source-select" class="block text-sm font-medium mb-1 text-theme">Time Awareness</label><select id="time-source-select"><option value="device">Device Time</option><option value="character">None</option></select></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="api-model-accordion">
+                        <button class="settings-accordion-header w-full flex justify-between items-center py-2">
+                            <h3 class="font-semibold text-theme">API & Model</h3>
+                            <svg data-lucide="chevron-down" class="accordion-icon icon-theme h-5 w-5 transition-transform"></svg>
+                        </button>
+                        <div class="settings-accordion-content overflow-hidden">
+                            <div class="pt-2 pb-4 space-y-4">
+                                
+                                <div class="mb-4"><label for="api-provider-select" class="block text-sm font-medium mb-1 text-theme">API Provider</label><select id="api-provider-select"><option value="none" selected>-- Select a Provider --</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter</option><option value="electronhub">Electron Hub</option><option value="cerebras">Cerebras</option></select></div>
+                                <div id="api-provider-prompt" class="text-center p-4 border-2 border-dashed border-theme rounded-lg"><p class="text-sm text-gray-500">Select a provider above to configure your API key and model.</p></div>
+                                <div id="api-settings-wrapper" class="hidden">
+                                    <div class="text-right -mt-2 mb-4"><button id="manage-custom-models-button" class="text-sm text-blue-500 hover:underline font-medium">Manage Custom Models</button></div>
+                                    <div id="gemini-settings-block"><div class="mb-4"><label for="model-select" class="block text-sm font-medium mb-1 text-theme">Gemini Model</label><select id="model-select"><option value="gemini-2.5-flash">Gemini 2.5 Flash (Default)</option><option value="gemini-2.5-pro">Gemini 2.5 Pro</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option><option value="gemini-2.0-flash">Gemini 2.0 Flash</option><option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</option></select></div><div class="flex justify-between items-center mb-1"><label class="block text-sm font-medium text-theme">Gemini API Key</label></div><div class="relative flex items-center"><input type="password" id="gemini-api-key-input" class="w-full p-2 border border-theme rounded-md bg-input text-input pr-10" placeholder="Enter your Gemini API Key"><button id="validate-gemini-key-button" title="Validate API Key" class="absolute right-0 p-2 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><svg data-lucide="check-circle" class="h-5 w-5"></svg></button></div><p class="text-xs text-gray-500 mt-2">Get your free API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 underline">Google AI Studio</a>.</p></div>
+                                    <div id="groq-settings-block" class="hidden"><div class="mb-4"><label for="groq-model-select" class="block text-sm font-medium mb-1 text-theme">Groq Model</label><select id="groq-model-select"><option value="llama-3.3-70b-versatile">Llama 3.3 70B</option><option value="compound-beta">Compound Beta</option><option value="gemma2-9b-it">Gemma2 9B</option><option value="openai/gpt-oss-120b">OpenAI: gpt-oss-120b</option><option value="moonshotai/kimi-k2-instruct">Kimi K2 Instruct</option><option value="custom">Custom Model...</option></select></div><div id="groq-custom-model-wrapper" class="hidden mb-4"><label for="groq-custom-model-input" class="block text-sm font-medium mb-1 text-theme">Custom Groq Model</label><input type="text" id="groq-custom-model-input" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="e.g., mixtral-8x7b-32768"></div><label for="groq-api-key-input" class="block text-sm font-medium mb-1 text-theme">Groq API Key</label><div class="relative flex items-center"><input type="password" id="groq-api-key-input" class="w-full p-2 border border-theme rounded-md bg-input text-input pr-10" placeholder="gsk_..."><button id="validate-groq-key-button" title="Validate API Key" class="absolute right-0 p-2 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><svg data-lucide="check-circle" class="h-5 w-5"></svg></button></div><p class="text-xs text-gray-500 mt-2">Get your free API key from <a href="https://console.groq.com/keys" target="_blank" class="text-blue-500 underline">GroqCloud</a>.</p></div>
+                                    <div id="openrouter-settings-block" class="hidden"><div class="mb-4"><label for="openrouter-model-select" class="block text-sm font-medium mb-1 text-theme">OpenRouter Model</label><select id="openrouter-model-select"><option value="openai/gpt-oss-20b:free">OpenAI: gpt-oss-20b</option><option value="z-ai/glm-4.5-air:free">GLM-4.5 Air</option><option value="deepseek/deepseek-r1:free">DeepSeek: R1</option><option value="meta-llama/llama-3.1-405b-instruct:free">Meta: Llama 3.1 405B Instruct</option><option value="qwen/qwen3-235b-a22b:free">Qwen3 235B</option><option value="custom">Custom Model...</option></select></div><div id="openrouter-custom-model-wrapper" class="hidden mb-4"><label for="openrouter-custom-model-input" class="block text-sm font-medium mb-1 text-theme">Custom OpenRouter Model</label><input type="text" id="openrouter-custom-model-input" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="e.g., openai/gpt-4o"></div><label for="openrouter-api-key-input" class="block text-sm font-medium mb-1 text-theme">OpenRouter API Key</label><div class="relative flex items-center"><input type="password" id="openrouter-api-key-input" class="w-full p-2 border border-theme rounded-md bg-input text-input pr-10" placeholder="sk-or-..."><button id="validate-openrouter-key-button" title="Validate API Key" class="absolute right-0 p-2 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><svg data-lucide="check-circle" class="h-5 w-5"></svg></button></div><p class="text-xs text-gray-500 mt-2">Get your free API key from <a href="https://openrouter.ai/keys" target="_blank" class="text-blue-500 underline">OpenRouter</a>.</p></div>
+                                    <div id="electronhub-settings-block" class="hidden"><div class="mb-4"><label for="electronhub-model-select" class="block text-sm font-medium mb-1 text-theme">Electron Hub Model</label><select id="electronhub-model-select"><option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</option><option value="command">Command R</option><option value="grok-3-mini">Grok 3 Mini</option><option value="rocinante-12b-v1.1">Rocinante 12B v1.1</option><option value="exaone-3-5-32b-instruct">EXAONE 32B Instruct</option><option value="custom">Custom Model...</option></select></div><div id="electronhub-custom-model-wrapper" class="hidden mb-4"><label for="electronhub-custom-model-input" class="block text-sm font-medium mb-1 text-theme">Custom Electron Hub Model</label><input type="text" id="electronhub-custom-model-input" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="e.g., custom-model-name"></div><label for="electronhub-api-key-input" class="block text-sm font-medium mb-1 text-theme">Electron Hub API Key</label><div class="relative flex items-center"><input type="password" id="electronhub-api-key-input" class="w-full p-2 border border-theme rounded-md bg-input text-input pr-10" placeholder="ek-..."><button id="validate-electronhub-key-button" title="Validate API Key" class="absolute right-0 p-2 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><svg data-lucide="check-circle" class="h-5 w-5"></svg></button></div><p class="text-xs text-gray-500 mt-2">Get your free API key from <a href="https://playground.electronhub.ai/console" target="_blank" class="text-blue-500 underline">Electron Hub</a>.</p></div>
+                                    <div id="cerebras-settings-block" class="hidden"><div class="mb-4"><label for="cerebras-model-select" class="block text-sm font-medium mb-1 text-theme">Cerebras Model</label><select id="cerebras-model-select"><option value="gpt-oss-120b">GPT-OSS 120B</option><option value="qwen-3-235b-a22b-instruct-2507">Qwen3 235B Instruct</option><option value="llama-4-maverick-17b-128e-instruct">Llama-4 Maverick 17B</option><option value="llama-3.3-70b">Llama 3.3 70B</option><option value="custom">Custom Model...</option></select></div><div id="cerebras-custom-model-wrapper" class="hidden mb-4"><label for="cerebras-custom-model-input" class="block text-sm font-medium mb-1 text-theme">Custom Cerebras Model</label><input type="text" id="cerebras-custom-model-input" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="e.g., your-custom-model"></div><label for="cerebras-api-key-input" class="block text-sm font-medium mb-1 text-theme">Cerebras API Key</label><div class="relative flex items-center"><input type="password" id="cerebras-api-key-input" class="w-full p-2 border border-theme rounded-md bg-input text-input pr-10" placeholder="Enter your Cerebras API key"><button id="validate-cerebras-key-button" title="Validate API Key" class="absolute right-0 p-2 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><svg data-lucide="check-circle" class="h-5 w-5"></svg></button></div><p class="text-xs text-gray-500 mt-2">Get your API key from <a href="https://cloud.cerebras.ai/" target="_blank" class="text-blue-500 underline">Cerebras Cloud</a>.</p></div>
+                                    </div>
+
+                                <div class="flex items-center justify-between"><label for="streaming-switch" class="text-sm font-medium text-theme">Stream AI Responses</label><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="streaming-switch" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div></label></div>
+                                <p class="text-xs text-gray-500 -mt-2 mb-4">When enabled, AI responses appear token-by-token. Disable for slower connections or if you prefer complete messages at once.</p>
+                                <div class="mb-4"><div class="flex justify-between items-center mb-1"><label for="history-depth-slider" class="block text-sm font-medium text-theme">Chat History Size</label><span id="history-depth-value" class="text-sm font-medium text-blue-500">16 Messages</span></div><input id="history-depth-slider" type="range" min="0" max="6" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"><p class="text-xs text-gray-500 mt-2">Controls how many recent messages are sent for context. "None" sends only the system prompt. Less history is cheaper but may reduce AI coherence.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button class="settings-accordion-header w-full flex justify-between items-center py-2">
+                            <h3 class="font-semibold text-theme">Data Management</h3>
+                            <svg data-lucide="chevron-down" class="accordion-icon icon-theme h-5 w-5 transition-transform"></svg>
+                        </button>
+                        <div class="settings-accordion-content overflow-hidden">
+                            <div class="pt-2 pb-4 space-y-4">
+                                <div class="space-y-2"><button id="upload-chat-button" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-700 border border-theme py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-opacity text-theme"><svg data-lucide="upload" class="icon-theme h-4 w-4"></svg><span>Import Character Data</span></button><p class="text-xs text-gray-500 mt-1">Import a character and their chat history from a .json file.</p><button id="restore-from-cloud-button" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-700 border border-theme py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-opacity text-theme" disabled><svg data-lucide="cloud-download" class="icon-theme h-4 w-4"></svg><span>Restore from Cloud</span></button><p class="text-xs text-gray-500 mt-1">Replace local history with the latest from the cloud. Available to all signed-in users.</p></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-theme pt-2">
+                        <button class="settings-accordion-header w-full flex justify-between items-center py-2">
+                            <h3 class="font-semibold text-red-500">Danger Zone</h3>
+                            <svg data-lucide="chevron-down" class="accordion-icon icon-theme h-5 w-5 transition-transform"></svg>
+                        </button>
+                        <div class="settings-accordion-content overflow-hidden">
+                            <div class="pt-2 pb-4 space-y-4">
+                                <div class="flex items-center justify-between mb-2"><label for="nsfw-switch" class="text-sm font-medium text-theme">Turn Off Filters</label><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="nsfw-switch" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:bg-red-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"></div></label></div><p class="text-xs text-gray-500 mt-1 mb-4">When enabled, the AI will not be explicitly instructed to block mature content. This does not bypass API provider filters.</p>
+                                
+                                <div id="secure-proxy-wrapper" class="flex items-center justify-between mb-2">
+                                    <label for="secure-proxy-switch" class="text-sm font-medium text-theme flex items-center gap-2">
+                                        <span>Use Secure Proxy</span>
+                                        <span id="proxy-premium-badge" class="hidden text-xs font-bold bg-purple-500 text-white px-2 py-0.5 rounded-full">PREMIUM</span>
+                                    </label>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="secure-proxy-switch" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:bg-red-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <p class="text-xs text-gray-500 mt-1 mb-4">Recommended. When disabled, your API key is sent directly from your browser (less secure). Premium feature.</p>
+                                <button id="reset-app-button" class="w-full bg-red-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-red-700 transition-colors mt-2">Reset & Erase All Data</button><p class="text-xs text-gray-500 mt-2">This will permanently delete all your chats, history, and settings from this device and from your cloud account (if signed in). This action cannot be undone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                               
+                <div class="text-center text-xs text-gray-500 pt-4 border-t border-theme">
+                    &copy; Copyright 2025 <a href="https://github.com/exanx/idolon" target="_blank" rel="noopener noreferrer" class="underline hover:text-blue-500">EXANX</a>
+                    <br>
+                    Idolon Version: 1.0.6
+                </div>
+            </div>
+        </div>
+
+        <!-- Character & Group Modal -->
+        <div id="character-modal-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-40 hidden"></div>
+        <div id="character-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-theme rounded-lg shadow-xl z-50 hidden grid grid-rows-[auto_1fr_auto]">
+            <header id="character-modal-header" class="px-4 md:px-6 py-4 flex-shrink-0">
+                <h2 id="character-modal-title" class="text-2xl font-bold text-theme">Add New Chat</h2>
+            </header>
+            <div id="character-modal-content" class="overflow-y-auto min-h-0 px-4 md:px-6 space-y-4">
+
+                <div id="group-name-wrapper" class="hidden">
+                    <label for="group-name-input" class="block text-sm font-medium mb-1 text-theme">Group Name</label>
+                    <input type="text" id="group-name-input" class="w-full p-2 border border-theme rounded-md bg-input text-input">
+                </div>
+
+                <div id="character-details-wrapper" class="flex items-center gap-4">
+                    <img id="char-avatar-preview" class="w-16 h-16 rounded-full object-cover cursor-pointer bg-gray-200 dark:bg-gray-700">
+                    <div class="flex-1">
+                         <label for="char-name-input" class="block text-sm font-medium mb-1 text-theme">AI Name</label>
+                         <input type="text" id="char-name-input" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="Start with a name or enhance below">
+                    </div>
+                </div>
+
+                <div id="character-fields">
+                    <div>
+                        <label for="char-type-select" class="block text-sm font-medium mb-1 text-theme">Character Type</label>
+                        <select id="char-type-select">
+                            <option value="messaging">Messaging</option>
+                            <option value="roleplay">Roleplay</option>
+                            <!-- START: ADDED FOR ADVENTURE GAME FEATURE -->
+                            <option value="adventure">Adventure Game</option>
+                            <!-- END: ADDED FOR ADVENTURE GAME FEATURE -->
+                            <option value="assistant">Assistant</option>
+                        </select>
+                    </div>
+                     
+                    <div>
+                        <label for="char-language-input" class="block text-sm font-medium mb-1 text-theme">Language</label>
+                        <input type="text" id="char-language-input" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="e.g., English, Spanish, Japanese">
+                    </div>
+
+                    <div id="roleplay-fields-wrapper" class="hidden space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="char-scenario-input" class="block text-sm font-medium text-theme">Scenario Summary</label>
+                                <button type="button" id="enhance-scenario-button" class="p-1 rounded-full hover-theme" title="Enhance from Scenario with AI">
+                                    <svg data-lucide="sparkles" class="h-4 w-4 icon-theme"></svg>
+                                </button>
+                            </div>
+                            <textarea id="char-scenario-input" rows="3" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="e.g., A detective investigating a mysterious disappearance of a woman in a rain-slicked city in 1942."></textarea>
+                        </div>
+                        
+                        <!-- START: ADDED FOR ADVENTURE GAME LENGTH -->
+                        <div id="adventure-length-wrapper" class="hidden">
+                            <label for="char-adventure-length-select" class="block text-sm font-medium mb-1 text-theme">Adventure Length</label>
+                            <select id="char-adventure-length-select">
+                                <option value="<10">Very Short (&lt; 10 Turns)</option>
+                                <option value="10-15">Short (10-15 Turns)</option>
+                                <option value="15-25" selected>Medium (15-25 Turns)</option>
+                                <option value="25-50">Long (25-50 Turns)</option>
+                                <option value="unlimited">Unlimited</option>
+                            </select>
+                        </div>
+                        <!-- END: ADDED FOR ADVENTURE GAME LENGTH -->
+                        
+                        <div>
+                            <label for="char-first-message-input" class="block text-sm font-medium mb-1 text-theme">AI's First Message (Greeting)</label>
+                            <textarea id="char-first-message-input" rows="3" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="The first message the AI will send to start the roleplay. e.g., *The rain hammered against the window of your office. A shadow fell across the frosted glass of the door before it opened, revealing a drenched figure.*"></textarea>
+                        </div>
+                        <div>
+                            <label for="char-example-dialogue-input" class="block text-sm font-medium mb-1 text-theme">Example Dialogue (Optional)</label>
+                            <textarea id="char-example-dialogue-input" rows="4" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="Show the AI the desired style.&#10;User: I'm here about the case.&#10;AI: *He gestured to a worn leather chair with a water-logged hat.* &quot;The name's Detective Harding. Spill it.&quot;"></textarea>
+                        </div>
+                    </div>
+					 
+                    <div id="ai-persona-wrapper">
+                        <div class="flex justify-between items-center mb-1">
+                            <label for="char-persona-input" id="ai-persona-label" class="block text-sm font-medium text-theme">AI Persona</label>
+                            <div class="flex items-center gap-2">
+                                <button type="button" id="analyze-image-button" class="p-1 rounded-full hover-theme hidden" title="Analyze Appearance from Image">
+                                    <svg data-lucide="scan-face" class="h-4 w-4 icon-theme"></svg>
+                                </button>
+                                <button type="button" id="generate-image-prompt-button" class="p-1 rounded-full hover-theme" title="Analyze Persona for Image Prompt">
+                                    <svg data-lucide="wand-2" class="h-4 w-4 icon-theme"></svg>
+                                </button>
+                                <button type="button" id="enhance-persona-button" class="p-1 rounded-full hover-theme" title="Enhance Persona with AI">
+                                    <svg data-lucide="sparkles" class="h-4 w-4 icon-theme"></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="char-persona-input" rows="4" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="Enter persona details or enhance..."></textarea>
+                    </div>
+                </div>
+
+                <div id="group-fields" class="hidden">
+                    <div>
+                         <label for="group-type-select" class="block text-sm font-medium mb-1 text-theme">Group Type</label>
+                        <select id="group-type-select">
+                            <option value="messaging">Messaging</option>
+                            <option value="roleplay">Roleplay</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-theme">Select Participants</label>
+                        <div id="group-participant-list" class="max-h-32 overflow-y-auto border border-theme rounded-md p-2 space-y-2 bg-input">
+                        </div>
+                    </div>
+                </div>
+				
+                 <div id="user-persona-wrapper">
+                    <label for="char-user-persona-input" id="user-persona-label" class="block text-sm font-medium mb-1 text-theme">Your Persona (Optional)</label>
+                    <textarea id="char-user-persona-input" rows="3" class="w-full p-2 border border-theme rounded-md bg-input text-input"></textarea>
+                </div>
+                <div>
+                    <label for="char-other-details-input" class="block text-sm font-medium mb-1 text-theme">Other Details (Optional)</label>
+                    <textarea id="char-other-details-input" rows="3" class="w-full p-2 border border-theme rounded-md bg-input text-input" placeholder="e.g., Voice actor preferences, character trivia, specific knowledge domain..."></textarea>
+                </div>
+            </div>
+            <footer id="character-modal-footer" class="px-4 md:px-6 py-4 flex-shrink-0 border-t border-theme">
+                <div class="flex justify-between items-center">
+                    <button id="delete-character-button" class="text-red-500 hover:text-red-700 font-semibold hidden">Delete</button>
+                    <div class="flex gap-2">
+                        <button id="cancel-character-modal" class="py-2 px-4 rounded-md bg-gray-500 text-white hover:bg-gray-600">Cancel</button>
+                        <button id="save-character-button" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">Save</button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <div id="avatar-source-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden"></div>
+        <div id="avatar-source-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xs bg-theme rounded-lg shadow-xl p-4 z-50 hidden flex-col gap-3">
+            <h3 class="text-lg font-bold text-center text-theme">Change Avatar</h3>
+            <div class="flex flex-col gap-3">
+                <button id="avatar-upload-device-button" class="w-full py-2 px-4 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors">Upload from Device</button>
+                <button id="avatar-enter-link-button" class="w-full py-2 px-4 rounded-md bg-gray-200 dark:bg-gray-600 text-theme hover-theme">Enter Image URL</button>
+            </div>
+            <div id="avatar-link-input-wrapper" class="hidden w-full flex-col gap-2">
+                <input type="url" id="avatar-url-input" placeholder="https://..." class="w-full p-2 border border-theme rounded-md bg-input text-input">
+                <button id="avatar-url-confirm-button" class="w-full py-2 px-4 rounded-md bg-green-600 text-white hover:bg-green-700">Confirm</button>
+            </div>
+            <button id="avatar-source-cancel-button" class="w-full py-2 px-4 rounded-md bg-gray-500 hover:bg-gray-600 text-white mt-2">Cancel</button>
+        </div>
+
+        <div id="import-character-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden"></div>
+        <div id="import-character-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-theme rounded-lg shadow-xl p-6 z-50 hidden flex-col gap-4 text-theme">
+            <h3 class="text-xl font-bold text-center">Character Exists</h3>
+            <p id="import-character-message" class="text-sm text-center">A character with this name already exists. How would you like to proceed?</p>
+            <div class="flex flex-col gap-3 mt-2">
+                <button id="import-replace-char-button" class="w-full py-2.5 px-4 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors">
+                    <strong>Replace Existing Character</strong>
+                    <span class="block text-xs opacity-80">Overwrites the current character and their chat.</span>
+                </button>
+                <button id="import-create-new-char-button" class="w-full py-2.5 px-4 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                    <strong>Create as New Character</strong>
+                    <span class="block text-xs opacity-80">Imports the character as a new chat.</span>
+                </button>
+            </div>
+            <button id="import-char-cancel-button" class="w-full py-2 px-4 rounded-md bg-gray-500 hover:bg-gray-600 text-white mt-2">Cancel</button>
+        </div>
+
+        <div id="confirm-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden"></div>
+        <div id="confirm-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-theme text-theme rounded-lg shadow-xl p-6 z-50 hidden flex-col gap-4">
+            <h3 id="confirm-title" class="text-xl font-bold text-center">Confirm Action</h3>
+            <p id="confirm-message" class="text-sm text-center">Are you sure?</p>
+            <div class="flex justify-end gap-3 mt-4">
+                <button id="confirm-cancel-button" class="py-2 px-4 rounded-md bg-gray-500 hover:bg-gray-600 text-white">Cancel</button>
+                <button id="confirm-ok-button" class="font-bold py-2 px-4 rounded-md text-white transition-colors">Confirm</button>
+            </div>
+        </div>
+
+        <div id="custom-models-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden"></div>
+        <div id="custom-models-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-theme text-theme rounded-lg shadow-xl z-50 hidden flex-col">
+            <header class="flex items-center justify-between p-4 border-b border-theme">
+                <h3 class="text-xl font-bold">Manage Custom Models</h3>
+                <button id="close-custom-models-modal" class="p-2 rounded-full hover-theme">
+                    <svg data-lucide="x" class="icon-theme h-5 w-5"></svg>
+                </button>
+            </header>
+            <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                <div><h4 class="font-semibold mb-2">Groq Models</h4><ul id="groq-models-list" class="space-y-2"></ul></div>
+                <div><h4 class="font-semibold mb-2">OpenRouter Models</h4><ul id="openrouter-models-list" class="space-y-2"></ul></div>
+				<div><h4 class="font-semibold mb-2">Electron Hub Models</h4><ul id="electronhub-models-list" class="space-y-2"></ul></div>
+                <div><h4 class="font-semibold mb-2">Cerebras Models</h4><ul id="cerebras-models-list" class="space-y-2"></ul></div>
+            </div>
+        </div>
+        
+        </div>
+        
+        <input type="file" id="user-avatar-upload-input" class="hidden" accept="image/*">
+        <input type="file" id="char-avatar-upload-input" class="hidden" accept="image/*">
+        <input type="file" id="image-input" class="hidden" accept="image/*">
+        <input type="file" id="chat-upload-input" class="hidden" accept=".json,text/plain">
+    </div>
+	
+    <!-- TERMS OF SERVICE GATEKEEPER MODAL -->
+    <div id="terms-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-[110] hidden"></div>
+    <div id="terms-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white dark:bg-gray-900 text-theme rounded-lg shadow-xl z-[120] p-6 hidden flex-col gap-4">        
+        <h3 id="terms-modal-title" class="text-2xl font-bold text-center">Terms of Service</h3>
+        <div id="terms-content" class="text-sm opacity-90 max-h-[60vh] overflow-y-auto p-4 border border-theme rounded-md bg-input">
+            <p class="font-bold mb-2">Welcome to Idolon!</p>
+            <p class="mb-3">By using this application ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the Service.</p>
+            <p class="font-bold mb-2">1. API Keys and Data</p>
+            <p class="mb-3">The Service requires you to provide your own API keys from third-party providers (e.g., Google, Groq). You are solely responsible for the usage of your API keys and any costs incurred. We are not liable for any misuse or charges related to your keys. Your keys, chats, and character data are stored locally in your browser or synced to your personal cloud account if you sign in. We do not have access to this data.</p>
+            <p class="font-bold mb-2">2. Content and Conduct</p>
+            <p class="mb-3">You are responsible for all content you generate using the Service. You agree not to use the Service for any illegal or unauthorized purpose. The "Turn Off Filters" option only removes a client-side instruction; it does not and cannot bypass the safety filters of the underlying API provider.</p>
+            <p class="font-bold mb-2">3. Disclaimer of Warranty</p>
+            <p class="mb-3">The Service is provided "as is," without warranty of any kind. We do not guarantee the accuracy, reliability, or availability of the Service or the content generated by the AI models.</p>
+            <p class="text-center mt-4">By clicking "Agree and Continue," you confirm that you have read, understood, and agree to these terms.</p>
+        </div>
+        <button id="terms-agree-button" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors mt-2">
+            Agree and Continue
+        </button>
+    </div>
+    
+    <!-- UPDATE NOTIFICATION BANNER -->
+    <div id="update-notification" class="hidden fixed bottom-4 right-4 z-[200] bg-blue-600 text-white py-3 px-5 rounded-lg shadow-lg flex items-center gap-4 animate-fade-in-up">
+        <span>A new version is available!</span>
+        <button id="update-button" class="bg-white text-blue-700 font-bold py-1 px-3 rounded-md hover:bg-blue-100 transition-colors">
+            Update & Reload
+        </button>
+    </div>
+
+    <script type="module" src="app.js"></script>
+	
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('Service Worker registered successfully:', registration);
+            })
+            .catch(error => {
+              console.log('Service Worker registration failed:', error);
+            });
+        });
+      }
+    </script>
+	
+</body>
+</html>
