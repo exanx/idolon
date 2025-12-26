@@ -1,0 +1,489 @@
+--- START OF FILE styles.css ---
+
+/* --- START: Custom Settings Panel Title Color --- */
+/* Color for Light Mode */
+html[data-mode="light"] #settings-panel .settings-accordion-header h3.text-theme {
+    color: #1d4ed8; 
+}
+
+/* Color for Dark Mode */
+html[data-mode="dark"] #settings-panel .settings-accordion-header h3.text-theme {
+    color: #60a5fa;
+}
+/* --- END: Custom Settings Panel Title Color --- */
+
+/* --- START: ACCORDION DROPDOWN FIX --- */
+.settings-accordion-content.overflow-visible {
+    overflow: visible;
+}
+.custom-select-options {
+    max-height: 200px; /* Or whatever height you prefer */
+    overflow-y: auto;
+}
+/* --- END: ADD THIS FOR ACCORDION DROPDOWN FIX --- */
+
+/* --- START: BLINKING CURSOR --- */
+@keyframes blink {
+    50% { opacity: 0; }
+}
+.blinking-cursor {
+    animation: blink 1s step-end infinite;
+}
+/* --- END: ADD THIS FOR BLINKING CURSOR --- */
+
+/* --- START: ADVENTURE GAME UI (REVISED) --- */
+.adventure-intro-container {
+    text-align: center;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.9;
+}
+.adventure-start-button {
+    align-self: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 2.5rem;
+    background-color: #3b82f6; /* Blue-500 */
+    color: white;
+    font-weight: bold;
+    border-radius: 9999px; /* Pill shape */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.adventure-start-button:hover {
+    background-color: #2563eb; /* Blue-600 */
+    transform: scale(1.05);
+}
+.adventure-start-button:disabled {
+    background-color: #9ca3af; /* Gray-400 */
+    cursor: not-allowed;
+    transform: none;
+}
+.adventure-scene {
+    padding: 1rem 0.5rem;
+    color: var(--text-color);
+    font-style: italic;
+    line-height: 1.6;
+    opacity: 0.95;
+}
+.adventure-player-choice {
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    font-weight: 700;
+    text-align: center;
+    color: var(--text-color);
+    font-size: 1.125rem; /* text-lg */
+}
+.adventure-choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; 
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 32rem; 
+    align-self: center;
+}
+.adventure-choice-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    text-align: left;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.adventure-choice-button:hover {
+    background-color: var(--hover-bg);
+    border-color: #3b82f6;
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.adventure-end-text {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.25rem; /* text-xl */
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    background-color: var(--input-bg);
+    border-radius: 0.5rem;
+}
+
+/* --- START: DESKTOP ADVENTURE LAYOUT --- */
+@media (min-width: 768px) {
+    .adventure-choices-container {
+        display: grid; /* Change to grid layout on desktop */
+        grid-template-columns: repeat(2, 1fr); /* Define two equal columns */
+        gap: 0.5rem; /* Slightly reduce the gap */
+        max-width: 40rem; /* Widen the container for the grid */
+    }
+    .adventure-choice-button {
+        font-size: 0.875rem; /* Make the font smaller */
+        padding: 0.6rem 0.8rem; /* Slightly reduce padding */
+    }
+}
+/* --- END: DESKTOP ADVENTURE LAYOUT --- */
+/* --- START: ADD THIS FOR ADVENTURE GAME ERROR HANDLING --- */
+.adventure-error-container {
+    text-align: center;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    background-color: rgba(239, 68, 68, 0.1); /* Red-500 with 10% opacity */
+    border: 1px solid rgba(239, 68, 68, 0.4); /* Red-500 with 40% opacity */
+    border-radius: 0.75rem;
+    color: var(--text-color);
+}
+.adventure-error-text {
+    font-style: italic;
+    color: #ef4444; /* Red-500 */
+    margin-bottom: 1rem;
+}
+html[data-mode="dark"] .adventure-error-text {
+    color: #f87171; /* Red-400 */
+}
+/* --- END: ADD THIS FOR ADVENTURE GAME ERROR HANDLING --- */
+
+/* Custom Scrollbar for ToS Modal */
+#terms-content-new::-webkit-scrollbar { width: 6px; }
+#terms-content-new::-webkit-scrollbar-track { background: transparent; }
+#terms-content-new::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb-color); border-radius: 10px; }
+
+/* Hide WhatsApp Camera Button */
+#whatsapp-camera-button {
+    display: none !important;
+}
+    
+/* WhatsApp Icon Alignment Fix */
+body[data-theme="theme-whatsapp"] #message-form {
+    background-color: var(--input-bg);
+    border-radius: 9999px; /* This makes it a pill shape */
+    padding: 0 0.5rem;      /* Add some horizontal padding */
+}
+body[data-theme="theme-whatsapp"] #message-input-wrapper {
+    background-color: transparent; /* Remove the background from the inner div */
+    padding: 0;                    /* Remove its padding */
+}
+
+/* Set correct icon color for the entire input bar in WhatsApp Light Mode */
+html[data-mode="light"] body[data-theme="theme-whatsapp"] #message-form .icon-theme {
+    color: #54656f;
+}
+
+/* Messenger Light Mode Icon Color Fix */
+html[data-mode="light"] body[data-theme="theme-messenger"] {
+    --icon-color: #0084ff; /* Messenger blue for icons */
+}
+html[data-mode="light"] body[data-theme="theme-messenger"] #send-button .icon-theme {
+    color: #ffffff;
+}
+    
+/* Modern Send Button for Idolon Theme */
+body[data-theme="theme-idolon"] #send-button {
+    background: none !important;
+}
+body[data-theme="theme-idolon"] #send-button .icon-theme {
+    color: var(--icon-color);
+}
+    
+/* --- Base & Default Theme (Idolon Dark) --- */
+body[data-theme="theme-idolon"] {
+    --bg-color: #000000; --text-color: #e5e7eb; --header-bg: #111827; --header-text: #e5e7eb;
+    --user-bubble-bg: #3b82f6; --user-bubble-text: #ffffff; --ai-bubble-bg: #1f2937; --ai-bubble-text: #e5e7eb;
+    --input-bg: #1f2937; --input-text: #e5e7eb; --border-color: #374151; --button-bg: #3b82f6; --button-text: #ffffff;
+    --icon-color: #9ca3af; --sidebar-bg: #111827; --sidebar-border: #374151; --hover-bg: rgba(255, 255, 255, 0.05);
+    --active-char-bg: rgba(255, 255, 255, 0.1); --code-bg: #1f2937; --system-bubble-bg: #52525b; --system-bubble-text: #e5e7eb;
+    --scrollbar-thumb-color: #4b5563;
+    position: relative; background-color: transparent; overflow: hidden;
+}
+    
+/* Light Mode for Idolon Theme */
+html[data-mode="light"] body[data-theme="theme-idolon"] {
+    --bg-color: #f9fafb; --text-color: #1f2937; --header-bg: #ffffff; --header-text: #1f2937;
+    --user-bubble-bg: #3b82f6; --user-bubble-text: #ffffff; --ai-bubble-bg: #e5e7eb; --ai-bubble-text: #1f2937;
+    --input-bg: #f3f4f6; --input-text: #1f2937; --border-color: #e5e7eb; --button-bg: #3b82f6; --button-text: #ffffff;
+    --icon-color: #6b7280; --sidebar-bg: #f9fafb; --sidebar-border: #e5e7eb; --hover-bg: rgba(0, 0, 0, 0.05);
+    --active-char-bg: rgba(0, 0, 0, 0.07); --code-bg: #f3f4f6; --system-bubble-bg: #a1a1aa; --system-bubble-text: #ffffff;
+    --scrollbar-thumb-color: #d1d5db;
+    background-color: var(--bg-color);
+}
+
+/* --- Idolon Animated Lava Lamp Background --- */
+@keyframes plasma-move {
+    0%   { transform: translate(0, 0) rotate(0deg) scale(1.2); }
+    25%  { transform: translate(40vw, -30vh) rotate(90deg) scale(1); }
+    50%  { transform: translate(80vw, 60vh) rotate(180deg) scale(1.3); }
+    75%  { transform: translate(10vw, 80vh) rotate(270deg) scale(0.9); }
+    100% { transform: translate(0, 0) rotate(360deg) scale(1.2); }
+}
+
+body[data-theme="theme-idolon"]::before,
+body[data-theme="theme-idolon"]::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    filter: blur(50px); 
+}
+
+body[data-theme="theme-idolon"]::before {
+    width: 60vmin;
+    height: 60vmin;
+    background: #4f46e5; 
+    animation: plasma-move 20s ease-in-out infinite;
+}
+
+body[data-theme="theme-idolon"]::after {
+    width: 45vmin;
+    height: 45vmin;
+    background: #7c3aed; 
+    animation: plasma-move 15s ease-in-out infinite;
+    animation-delay: -8s; 
+}
+
+/* Light mode overrides for the lava lamp */
+html[data-mode="light"] body[data-theme="theme-idolon"]::before {
+    background: rgba(79, 70, 229, 0.3); 
+}
+
+html[data-mode="light"] body[data-theme="theme-idolon"]::after {
+    background: rgba(124, 58, 237, 0.25);
+}
+
+/* FIX: Ensure the chat container background is transparent in Idolon mode 
+   to allow the animated body background to show through. */
+body[data-theme="theme-idolon"] #app-container { background-color: transparent; } 
+html[data-mode="light"] body[data-theme="theme-idolon"] #app-container { background-color: var(--bg-color); } /* Light mode must be solid */
+
+body[data-theme="theme-idolon"] #message-input-wrapper { background-color: var(--input-bg); }
+    
+/* --- DEFAULT ROOT VARIABLES (Light Mode Base) --- */
+:root {
+    --bg-color: #ffffff; --text-color: #1f2937; --header-bg: #f9fafb; --header-text: #1f2937;
+    --user-bubble-bg: #3b82f6; --user-bubble-text: #ffffff; --ai-bubble-bg: #e5e7eb; --ai-bubble-text: #1f2937;
+    --input-bg: #f3f4f6; --input-text: #1f2937; --border-color: #e5e7eb; --button-bg: #3b82f6; --button-text: #ffffff;
+    --icon-color: #6b7280; --font-family: 'Inter', sans-serif; --sidebar-bg: #f9fafb; --sidebar-border: #e5e7eb;
+    --hover-bg: rgba(0, 0, 0, 0.05); --active-char-bg: rgba(0, 0, 0, 0.07); --code-bg: #f3f4f6;
+    --system-bubble-bg: #a1a1aa; --system-bubble-text: #ffffff; --scrollbar-thumb-color: #d1d5db;
+}
+/* --- DEFAULT ROOT VARIABLES (Dark Mode Override) --- */
+html[data-mode="dark"] {
+    --bg-color: #111827; --text-color: #e5e7eb; --header-bg: #1f2937; --header-text: #e5e7eb;
+    --user-bubble-bg: #3b82f6; --ai-bubble-bg: #374151; --ai-bubble-text: #e5e7eb; --input-bg: #1f2937;
+    --input-text: #e5e7eb; --border-color: #374151; --icon-color: #9ca3af; --sidebar-bg: #1f2937; --sidebar-border: #374151;
+    --hover-bg: rgba(255, 255, 255, 0.05); --active-char-bg: rgba(255, 255, 255, 0.1); --code-bg: #1f2937;
+    --system-bubble-bg: #52525b; --system-bubble-text: #e5e7eb; --scrollbar-thumb-color: #4b5563;
+}
+.bg-theme { background-color: var(--bg-color); } .text-theme { color: var(--text-color); }
+.bg-header { background-color: var(--header-bg); } .text-header { color: var(--header-text); }
+.border-theme { border-color: var(--border-color); } .user-bubble { background: var(--user-bubble-bg); color: var(--user-bubble-text); }
+.ai-bubble { background: var(--ai-bubble-bg); color: var(--ai-bubble-text); } .system-bubble { background-color: var(--system-bubble-bg); color: var(--system-bubble-text); }
+.bg-input { background-color: var(--input-bg); } .text-input { color: var(--input-text); }
+.bg-button { background-color: var(--button-bg); } .text-button { color: var(--button-text); }
+.icon-theme { color: var(--icon-color); } .bg-sidebar { background-color: var(--sidebar-bg); }
+.border-sidebar { border-color: var(--sidebar-border); } .hover-theme:hover { background-color: var(--hover-bg); }
+.character-item.active { background-color: var(--active-char-bg); }
+
+/* Theme-Specific Styling */
+.theme-icon { display: none; }
+body[data-theme="theme-idolon"] .icon-idolon, body[data-theme="theme-imessage"] .icon-imessage,
+body[data-theme="theme-whatsapp"] .icon-whatsapp, body[data-theme="theme-messenger"] .icon-messenger,
+body[data-theme="theme-instagram"] .icon-instagram, body[data-theme="theme-twitter"] .icon-twitter { display: inline-flex; }
+#message-input-wrapper { border-radius: 9999px; }
+    
+/* Idolon Icon Fix */
+body[data-theme="theme-idolon"] #image-upload-button .icon-idolon { display: inline-flex; }
+body[data-theme="theme-idolon"] #image-upload-button .icon-theme, html[data-mode="light"] body[data-theme="theme-idolon"] #image-upload-button .icon-theme { color: var(--icon-color); }
+    
+/* iMessage */
+body[data-theme="theme-imessage"] { --user-bubble-bg: #007aff; --ai-bubble-bg: #e5e5ea; --ai-bubble-text: #000; --button-bg: #007aff; --input-bg: #ffffff; --border-color: #dcdcdc; --sidebar-bg: #f2f2f7;}
+html[data-mode="dark"] body[data-theme="theme-imessage"] { --bg-color: #000000; --header-bg: #1c1c1e; --user-bubble-bg: #0b84ff; --ai-bubble-bg: #2c2c2e; --ai-bubble-text: #ffffff; --input-bg: #2c2c2e; --border-color: #2c2c2e; --sidebar-bg: #1c1c1e;}
+body[data-theme="theme-imessage"] #message-input-wrapper { border-radius: 0.75rem; }
+
+/* WhatsApp Theme */
+body[data-theme="theme-whatsapp"] {
+    --font-family: 'Roboto', sans-serif; --bg-color: #f5f1eb; --header-bg: #ffffff; --header-text: #000000; --user-bubble-bg: #d9fdd3;
+    --user-bubble-text: #000000; --ai-bubble-bg: #ffffff; --ai-bubble-text: #000000; --button-bg: #00A884; --input-bg: #FFFFFF;
+    --sidebar-bg: #ffffff; --sidebar-border: #e0e0e0; background-image: none;
+}
+html[data-mode="light"] body[data-theme="theme-whatsapp"] { --icon-color: #54656f; }
+body[data-theme="theme-whatsapp"] #app-container { background-color: var(--bg-color); }
+html[data-mode="light"] body[data-theme="theme-whatsapp"] #chat-header .icon-theme { color: #54656f; }
+html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar, html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar .text-theme,
+html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar .icon-theme { color: #000000; }
+html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar .character-item.active { background-color: rgba(255, 255, 255, 0.15); }
+html[data-mode="light"] body[data-theme="theme-whatsapp"] #sidebar .hover-theme:hover { background-color: rgba(255, 255, 255, 0.1); }
+html[data-mode="dark"] body[data-theme="theme-whatsapp"] {
+    --bg-color: #0b141a; --header-bg: #202c33; --header-text: #e7e9ea; --icon-color: #aebac1; --user-bubble-bg: #005c4b;
+    --user-bubble-text: #FFFFFF; --ai-bubble-bg: #202c33; --ai-bubble-text: #e7e9ea; --button-bg: #00a884; --sidebar-bg: #111b21;
+    --sidebar-border: #2f3336; --input-bg: #202c33; background-image: none;
+}
+
+/* Other Themes (Messenger, Instagram, Twitter) */
+body[data-theme="theme-messenger"] { --user-bubble-bg: linear-gradient(to top right, #00c6ff, #0072ff); --ai-bubble-bg: #e4e6eb; --ai-bubble-text: #050505; --button-bg: #0084ff; --sidebar-bg: #fff; --input-bg: #f0f2f5;}
+html[data-mode="light"] body[data-theme="theme-messenger"] { --icon-color: #0084ff; }
+html[data-mode="dark"] body[data-theme="theme-messenger"] { --bg-color: #18191a; --header-bg: #242526; --user-bubble-bg: linear-gradient(to top right, #00c6ff, #0072ff); --ai-bubble-bg: #3a3b3c; --ai-bubble-text: #e4e6eb; --sidebar-bg: #242526; --input-bg: #3a3b3c; --border-color: #3a3b3c; --icon-color: #0084ff; }
+body[data-theme="theme-instagram"] { --user-bubble-bg: #efefef; --user-bubble-text: #000; --ai-bubble-bg: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045); --ai-bubble-text: #fff; --sidebar-bg: #fff; --input-bg: #fff; --border-color: #dbdbdb;}
+html[data-mode="dark"] body[data-theme="theme-instagram"] { --bg-color: #000; --header-bg: #000; --user-bubble-bg: #262626; --user-bubble-text: #fff; --sidebar-bg: #000; --input-bg: #262626; --border-color: #363636;}
+body[data-theme="theme-twitter"] { --bg-color: #fff; --text-color: #0f1419; --header-bg: #fff; --user-bubble-bg: #1d9bf0; --ai-bubble-bg: #f7f9f9; --ai-bubble-text: #0f1419; --sidebar-bg: #fff; --input-bg: #eff3f4; --border-color: #eff3f4; --button-bg: #1d9bf0;}
+html[data-mode="dark"] body[data-theme="theme-twitter"] { --bg-color: #000; --text-color: #e7e9ea; --header-bg: #000; --border-color: #2f3336; --input-bg: #202327; --user-bubble-bg: #1d9bf0; --ai-bubble-bg: #202327; --ai-bubble-text: #e7e9ea; --sidebar-bg: #000;}
+
+/* Layout & Responsiveness */
+#chat-container { position: relative; }
+#chat-footer { position: sticky; bottom: 0; }
+#character-modal { max-height: 90vh; }
+#message-input { resize: none; overflow-y: auto; max-height: 5rem; }
+@media (max-width: 767px) {
+    #chat-container { display: flex; flex-direction: column; height: 100vh; height: 100svh; }
+    #message-area { flex: 1; min-height: 0; }
+    #chat-footer { z-index: 10; }
+    #settings-panel { max-width: none; width: 100vw; }
+    #character-modal { top: 0; left: 0; width: 100vw; height: 100vh; height: 100svh; max-width: none; max-height: none; transform: none; border-radius: 0; }
+}
+
+/* Custom scrollbar */
+#message-area::-webkit-scrollbar, 
+#settings-panel-content::-webkit-scrollbar, 
+#sidebar-content::-webkit-scrollbar, 
+#character-modal-content::-webkit-scrollbar, 
+#group-participant-list::-webkit-scrollbar, 
+#popdown-details-content::-webkit-scrollbar, 
+.custom-select-options::-webkit-scrollbar, 
+#message-input::-webkit-scrollbar,
+#terms-content-new::-webkit-scrollbar { 
+    width: 6px; 
+}
+
+#message-area::-webkit-scrollbar-track, 
+#settings-panel-content::-webkit-scrollbar-track, 
+#sidebar-content::-webkit-scrollbar-track, 
+#character-modal-content::-webkit-scrollbar-track, 
+#group-participant-list::-webkit-scrollbar-track, 
+#popdown-details-content::-webkit-scrollbar-track, 
+.custom-select-options::-webkit-scrollbar-track, 
+#message-input::-webkit-scrollbar-track,
+#terms-content-new::-webkit-scrollbar-track { 
+    background: transparent; 
+}
+
+#message-area::-webkit-scrollbar-thumb, 
+#settings-panel-content::-webkit-scrollbar-thumb, 
+#sidebar-content::-webkit-scrollbar-thumb, 
+#character-modal-content::-webkit-scrollbar-thumb, 
+#group-participant-list::-webkit-scrollbar-thumb, 
+#popdown-details-content::-webkit-scrollbar-thumb, 
+.custom-select-options::-webkit-scrollbar-thumb, 
+#message-input::-webkit-scrollbar-thumb,
+#terms-content-new::-webkit-scrollbar-thumb { 
+    background-color: var(--scrollbar-thumb-color); 
+    border-radius: 10px; 
+}
+
+/* Markdown Styles */
+.message-bubble p { margin-bottom: 0.5rem; } .message-bubble p:last-child { margin-bottom: 0; }
+.message-bubble ul, .message-bubble ol { margin-left: 1.25rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+.message-bubble li { margin-bottom: 0.25rem; }
+.message-bubble pre { background-color: var(--code-bg); padding: 0.75rem; border-radius: 0.5rem; margin: 0.5rem 0; white-space: pre-wrap; word-break: break-all; }
+.message-bubble code { font-family: monospace; } .message-bubble pre code { background: none; padding: 0; }
+.message-bubble > *:not(:last-child) { margin-bottom: 0.5rem; }
+.message-bubble img { max-width: 16rem; height: auto; border-radius: 0.75rem; display: block; }
+.image-bubble { padding: 6px; border-radius: 1.125rem; background-color: var(--border-color); }
+
+.hide-chat-avatars .user-avatar, .hide-chat-avatars .ai-avatar { display: none; }
+.hide-chat-avatars .group-ai-message .ai-avatar { display: block !important; }
+
+/* --- UX CHANGE: Message actions on hover/long-press --- */
+.message-actions-menu { min-width: 120px; }
+.message-container:not(:hover) .message-actions-trigger { display: none; }
+@media (max-width: 767px) {
+    .message-actions-trigger { display: none !important; }
+}
+
+.message-timestamp { font-size: 0.65rem; color: #9ca3af; white-space: nowrap; margin-top: 0.25rem; }
+html[data-mode="dark"] .message-timestamp { color: #6b7280; }
+
+/* Custom Select */
+.custom-select-container { position: relative; }
+.custom-select-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.375rem; background-color: var(--input-bg); color: var(--input-text); cursor: pointer; transition: border-color 0.2s; }
+.custom-select-trigger:focus, .custom-select-trigger.open { outline: 2px solid transparent; outline-offset: 2px; border-color: #3b82f6; }
+.custom-select-options { position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.25rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); z-index: 50; opacity: 0; transform: scale(0.95); transition: opacity 0.1s ease-out, transform 0.1s ease-out; pointer-events: none; }
+.custom-select-options.open { opacity: 1; transform: scale(1); pointer-events: auto; }
+.custom-select-option { padding: 0.5rem 0.75rem; cursor: pointer; } .custom-select-option:hover { background-color: var(--hover-bg); }
+.custom-select-option.selected { background-color: var(--active-char-bg); font-weight: 500; }
+
+/* Custom Select */
+.custom-select-container { position: relative; }
+.custom-select-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.375rem; background-color: var(--input-bg); color: var(--input-text); cursor: pointer; transition: border-color 0.2s; }
+.custom-select-trigger:focus, .custom-select-trigger.open { outline: 2px solid transparent; outline-offset: 2px; border-color: #3b82f6; }
+.custom-select-options { position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.25rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); z-index: 50; opacity: 0; transform: scale(0.95); transition: opacity 0.1s ease-out, transform 0.1s ease-out; pointer-events: none; }
+.custom-select-options.open { opacity: 1; transform: scale(1); pointer-events: auto; }
+.custom-select-option { padding: 0.5rem 0.75rem; cursor: pointer; } .custom-select-option:hover { background-color: var(--hover-bg); }
+.custom-select-option.selected { background-color: var(--active-char-bg); font-weight: 500; }
+
+/* FIX: Ensure original selects are hidden when replaced by the custom component */
+#settings-panel select, #character-modal select {
+    display: none !important;
+}
+
+/* --- UX CHANGE: Settings Accordion --- */
+.settings-accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+@keyframes typing-bubble { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+.typing-dot { animation: typing-bubble 1.4s infinite ease-in-out both; }
+.typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+#typing-indicator-container { position: absolute; bottom: 5rem; left: 1rem; z-index: 5; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+#typing-indicator-container.hidden { opacity: 0; transform: translateY(10px); pointer-events: none; }
+@media (min-width: 768px) { #typing-indicator-container { bottom: 5.5rem; } }
+
+#app-container.loaded { opacity: 1; }
+#character-details-popdown { position: absolute; top: 4rem; left: 1rem; right: 1rem; z-index: 25; }
+@media (min-width: 768px) { #character-details-popdown { left: auto; right: 1rem; } }
+#character-details-overlay { position: absolute; }
+#chat-loading-bar-container { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background-color: transparent; z-index: 20; opacity: 0; transition: opacity 0.3s ease-in-out; }
+#chat-loading-bar-container.visible { opacity: 1; }
+#chat-loading-bar { width: 0%; height: 100%; background-color: #3b82f6; }
+    
+/* Revamped Chat Footer */
+#chat-footer { padding: 0.5rem; background-color: var(--header-bg); transition: background-color 0.3s; border-top: 1px solid var(--border-color); }
+html[data-mode="light"] #chat-footer { background-color: var(--bg-color); border-color: var(--border-color); }
+html[data-mode="light"] body[data-theme="theme-idolon"] #chat-footer, html[data-mode="light"] body[data-theme="theme-whatsapp"] #chat-footer { background-color: var(--header-bg); border-color: transparent; }
+#message-form { display: flex; align-items: flex-end; gap: 0.5rem; }
+#message-input-wrapper { flex-grow: 1; display: flex; align-items: center; min-height: 44px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 9999px; transition: background-color 0.3s, border-color 0.3s; }
+html[data-mode="dark"] #message-input-wrapper { border-color: transparent; }
+#message-input { flex-grow: 1; padding: 0.5rem; line-height: 1.5; border: none; background: transparent; color: var(--input-text); }
+#message-input:focus { outline: none; }
+.footer-button { flex-shrink: 0; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s; border: none; background: none; padding: 0; }
+.footer-button .icon-theme, .footer-button svg { width: 24px; height: 24px; }
+.footer-button:not(#send-button) .icon-theme { color: var(--icon-color); }
+.input-action-button { flex-shrink: 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: none; background: none; padding: 0 0.5rem; border-radius: 9999px; }
+.input-action-button .icon-theme, .input-action-button svg { width: 24px; height: 24px; color: var(--icon-color); }
+#send-button { background: none !important; }
+body[data-theme="theme-idolon"] #send-button .icon-theme, body[data-theme="theme-twitter"] #send-button .icon-theme { color: var(--icon-color); }
+body[data-theme="theme-imessage"] #send-button .icon-theme, body[data-theme="theme-messenger"] #send-button .icon-theme { color: var(--button-bg); }
+html[data-mode="dark"] body[data-theme="theme-imessage"] #send-button .icon-theme, html[data-mode="dark"] body[data-theme="theme-messenger"] #send-button .icon-theme { color: var(--user-bubble-bg); }
+body[data-theme="theme-whatsapp"] #send-button .icon-theme { color: var(--button-bg); }
+body[data-theme="theme-instagram"] #send-button { width: auto; color: #0095f6; }
+html[data-mode="dark"] body[data-theme="theme-instagram"] #send-button { color: #0095f6; }
+body[data-theme="theme-imessage"] #message-input-wrapper { border-radius: 1.25rem; }
+html[data-mode="light"] body[data-theme="theme-imessage"] #message-input-wrapper { background-color: #FFFFFF; border-color: #E5E5E5; }
+body[data-theme="theme-whatsapp"] #message-form { background-color: var(--input-bg); border-radius: 9999px; padding: 0 0.5rem; }
+body[data-theme="theme-whatsapp"] #message-input-wrapper { background-color: transparent; border: none; padding: 0; }
+html[data-mode="light"] body[data-theme="theme-whatsapp"] #chat-footer .footer-button:not(#send-button) .icon-theme { color: #54656f; }
+html[data-mode="light"] body[data-theme="theme-whatsapp"] .input-action-button .icon-theme { color: #54656f; }
+body[data-theme="theme-instagram"] #message-input-wrapper { border: 1px solid var(--border-color); }
+html[data-mode="light"] #email-signin-toggle-button { background-color: #f3f4f6; border-color: #e5e7eb; }
+html[data-mode="light"] #email-signin-toggle-button:hover { background-color: #e5e7eb; }

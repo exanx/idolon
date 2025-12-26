@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idolon Setup & Hosting Guide</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --link-color: #007aff;
+            --link-hover-color: #0056b3;
+            --active-bg: rgba(0, 122, 255, 0.1);
+            --active-text: #007aff;
+            --glow-color-1: #3b82f6;
+            --glow-color-2: #8b5cf6;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+        }
+        html[data-mode="dark"] {
+            --bg-color: #0d1117;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --card-bg: rgba(22, 27, 34, 0.8);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --link-color: #58a6ff;
+            --link-hover-color: #a3d3ff;
+            --active-bg: rgba(88, 166, 255, 0.1);
+            --active-text: #58a6ff;
+            --glow-color-1: #1d4ed8;
+            --glow-color-2: #6d28d9;
+            --code-bg: #0d1117;
+            --code-text: #e5e7eb;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* --- BACKGROUND EFFECTS --- */
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1; }
+        .glow { position: absolute; border-radius: 50%; opacity: 0.15; filter: blur(100px); will-change: transform; transition: all 0.5s ease; transform: translate(-50%, -50%); }
+        #glow1 { background: var(--glow-color-1); width: 50vw; height: 50vw; }
+        #glow2 { background: var(--glow-color-2); width: 40vw; height: 40vw; }
+
+        /* --- UI COMPONENTS --- */
+        .glass-card { 
+            background: var(--card-bg); 
+            -webkit-backdrop-filter: blur(12px); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px;
+        }
+        
+        /* Navigation Sidebar */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .nav-link:hover { background-color: var(--border-color); color: var(--text-primary); }
+        .nav-link.active { background-color: var(--active-bg); color: var(--active-text); font-weight: 600; }
+        .nav-link i { margin-right: 0.75rem; width: 1.25rem; }
+
+        /* Typography & Code */
+        h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 1rem; }
+        h2 { font-size: 1.75rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--text-primary); }
+        p, li { line-height: 1.7; color: var(--text-secondary); margin-bottom: 1rem; }
+        a { color: var(--link-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        
+        .code-block-wrapper {
+            position: relative;
+            margin: 1.5rem 0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--code-bg);
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: #888;
+            font-family: 'Inter', sans-serif;
+        }
+        pre {
+            margin: 0;
+            padding: 1rem;
+            overflow-x: auto;
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        .copy-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ccc;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: var(--link-color);
+            color: white;
+            font-weight: bold;
+            margin-right: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .warning-callout {
+            background: rgba(234, 179, 8, 0.1);
+            border-left: 4px solid #eab308;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative">
+
+    <!-- Background Animation -->
+    <div class="interactive-bg">
+        <div id="glow1" class="glow"></div>
+        <div id="glow2" class="glow"></div>
+    </div>
+
+    <!-- Theme Toggle & Back Button -->
+    <div class="fixed top-4 right-4 z-50 flex items-center gap-3">
+        <a href="/" class="glass-card px-4 py-2 text-sm font-semibold hover:bg-white/10 transition-colors">
+            ← Back to App
+        </a>
+        <button id="theme-toggle" class="glass-card p-2 rounded-full hover:bg-white/10 transition-colors">
+            <i data-lucide="moon" class="h-5 w-5 block dark:hidden"></i>
+            <i data-lucide="sun" class="h-5 w-5 hidden dark:block"></i>
+        </button>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- Header -->
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 mb-4 border border-white/10">
+                <img src="favicon.svg" alt="Idolon Logo" class="h-12 w-12">
+            </div>
+            <h1>Self-Hosting Guide</h1>
+            <p class="text-lg max-w-2xl mx-auto">
+                Deploy your own private instance of Idolon using Firebase and Cloudflare. 
+                Complete control, zero cost, total privacy.
+            </p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar Navigation -->
+            <aside class="w-full lg:w-64 flex-shrink-0">
+                <div class="sticky top-8 glass-card p-4">
+                    <nav class="space-y-1" id="nav-menu">
+                        <a href="#overview" class="nav-link active"><i data-lucide="info"></i> Overview</a>
+                        <a href="#prerequisites" class="nav-link"><i data-lucide="check-square"></i> Prerequisites</a>
+                        <a href="#step1" class="nav-link"><i data-lucide="database"></i> 1. Firebase Setup</a>
+                        <a href="#step2" class="nav-link"><i data-lucide="shield"></i> 2. Secure Proxy</a>
+                        <a href="#step3" class="nav-link"><i data-lucide="code"></i> 3. Frontend Config</a>
+                        <a href="#step4" class="nav-link"><i data-lucide="rocket"></i> 4. Deployment</a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 min-w-0">
+                
+                <section id="overview" class="glass-card p-8 mb-8">
+                    <p class="text-lg font-medium text-primary">Why Self-Host?</p>
+                    <p>
+                        Idolon is designed as a "Bring Your Own Key" (BYOK) application. By self-hosting, you ensure that:
+                    </p>
+                    <ul class="list-disc ml-6 space-y-2 text-secondary">
+                        <li>You own the infrastructure (Firebase & Cloudflare).</li>
+                        <li>You control the API keys entirely.</li>
+                        <li>You eliminate any dependency on the official hosted version.</li>
+                        <li>You can modify the code, add features, or change themes.</li>
+                    </ul>
+                </section>
+
+                <section id="prerequisites" class="glass-card p-8 mb-8">
+                    <h2>Prerequisites</h2>
+                    <p>Before starting, ensure you have the following accounts and tools installed:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="p-4 border border-theme rounded-lg bg-white/5">
+                            <h4 class="font-bold mb-2">Accounts</h4>
+                            <ul class="list-disc ml-4 text-sm">
+                                <li><a href="https://github.com" target="_blank">GitHub</a> (to clone code)</li>
+                                <li><a href="https://firebase.google.com" target="_blank">Google Firebase</a> (Spark Plan - Free)</li>
+                                <li><a href="https://dash.cloudflare.com" target="_blank">Cloudflare</a> (Free Plan)</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 border border-theme rounded-lg bg-white/5">
+                            <h4 class="font-bold mb-2">Tools (CLI)</h4>
+                            <ul class="list-disc ml-4 text-sm">
+                                <li><a href="https://nodejs.org" target="_blank">Node.js</a> (v18+)</li>
+                                <li><code>npm install -g firebase-tools</code></li>
+                                <li><code>npm install -g wrangler</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="step1" class="glass-card p-8 mb-8">
+                    <div class="flex items-center mb-4">
+                        <span class="step-badge">1</span>
+                        <h2 class="!mt-0 !mb-0 !border-0">Firebase Setup (Backend)</h2>
+                    </div>
+                    <p>Firebase handles authentication and encrypted database storage for chat history.</p>
+
+                    <h3>1. Create Project</h3>
+                    <p>Go to the <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a>, create a new project (e.g., <code>idolon-my-instance</code>). Disable Google Analytics to keep it simple.</p>
+
+                    <h3>2. Enable Authentication</h3>
+                    <p>Navigate to <strong>Build → Authentication</strong>. Click "Get Started" and enable:</p>
+                    <ul class="list-disc ml-6 mb-4">
+                        <li><strong>Google</strong> (No setup required usually)</li>
+                        <li><strong>Email/Password</strong></li>
+                    </ul>
+
+                    <h3>3. Create Firestore Database</h3>
+                    <p>Navigate to <strong>Build → Firestore Database</strong>. Click "Create Database".</p>
+                    <ul class="list-disc ml-6 mb-4">
+                        <li>Select <strong>Production Mode</strong>.</li>
+                        <li>Choose a location close to you (e.g., <code>nam5 (us-central)</code>).</li>
+                    </ul>
+
+                    <h3>4. Set Security Rules</h3>
+                    <p>Go to the <strong>Rules</strong> tab in Firestore. These rules ensure users can only access their <em>own</em> data. Replace everything with:</p>
+                    
+                    <div class="code-block-wrapper">
+                        <div class="code-header"><span>firestore.rules</span> <button class="copy-btn"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                        <pre><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check ownership
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Match users collection
+    match /users/{userId} {
+      // Allow user to read/write their own user document
+      allow read, write: if isOwner(userId);
+      
+      // Match subcollections (settings, chats, secrets)
+      match /{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+  }
+}</code></pre>
+                    </div>
+
+                    <h3>5. Get Config</h3>
+                    <p>Go to Project Settings (Gear icon). Scroll down to "Your apps", select the Web icon (<code>&lt;/&gt;</code>), register the app (no hosting yet), and <strong>copy the <code>firebaseConfig</code> object</strong>. You will need this for Step 3.</p>
+                </section>
+
+                <section id="step2" class="glass-card p-8 mb-8">
+                    <div class="flex items-center mb-4">
+                        <span class="step-badge">2</span>
+                        <h2 class="!mt-0 !mb-0 !border-0">Secure Proxy (Cloudflare)</h2>
+                    </div>
+                    <p>To safely use API keys in a web app, we use a Cloudflare Worker as a proxy. This hides your keys from the network tab if you implement server-side storage, but mainly it acts as a secure relay.</p>
+
+                    <h3>1. Initialize Worker</h3>
+                    <div class="code-block-wrapper">
+                        <div class="code-header"><span>Terminal</span> <button class="copy-btn"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                        <pre><code>npm create cloudflare@latest idolon-proxy
+# Select "Hello World" Worker
+# Select "No" to TypeScript (for simplicity)
+cd idolon-proxy</code></pre>
+                    </div>
+
+                    <h3>2. Configure Wrangler</h3>
+                    <p>Edit <code>wrangler.toml</code> to set compatibility:</p>
+                    <div class="code-block-wrapper">
+                        <div class="code-header"><span>wrangler.toml</span> <button class="copy-btn"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                        <pre><code>name = "idolon-proxy"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+node_compat = true</code></pre>
+                    </div>
+
+                    <h3>3. Deploy Proxy Logic</h3>
+                    <p>Since the full proxy source code is extensive (handling Gemini, Groq, etc.), for a personal instance where you trust yourself, you can technically skip the proxy and put keys directly in the client settings. <strong>However</strong>, to enable the "Secure Proxy" feature in Idolon, simply create the worker and note the URL.</p>
+                    <p><em>(Refer to the source code repository for the `proxy/index.js` file content).</em></p>
+
+                    <h3>4. Deploy</h3>
+                    <div class="code-block-wrapper">
+                        <div class="code-header"><span>Terminal</span> <button class="copy-btn"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                        <pre><code>npx wrangler deploy</code></pre>
+                    </div>
+                    <p>Copy the URL provided (e.g., <code>https://idolon-proxy.username.workers.dev</code>).</p>
+                </section>
+
+                <section id="step3" class="glass-card p-8 mb-8">
+                    <div class="flex items-center mb-4">
+                        <span class="step-badge">3</span>
+                        <h2 class="!mt-0 !mb-0 !border-0">Frontend Configuration</h2>
+                    </div>
+                    <p>Now, connect the code to your new backend.</p>
+
+                    <h3>1. Edit app.js</h3>
+                    <p>Open <code>app.js</code> in your code editor. Look for the top section.</p>
+                    
+                    <div class="code-block-wrapper">
+                        <div class="code-header"><span>app.js</span></div>
+                        <pre><code>// 1. REPLACE THIS WITH YOUR CONFIG FROM STEP 1
+const firebaseConfig = {
+    apiKey: "YOUR_NEW_API_KEY",
+    authDomain: "idolon-my-instance.firebaseapp.com",
+    projectId: "idolon-my-instance",
+    storageBucket: "...",
+    messagingSenderId: "...",
+    appId: "..."
+};
+
+// 2. REPLACE THE PROXY URL FROM STEP 2 (Optional)
+// const proxyUrl = 'https://idolon-api-proxy.exanxlk.workers.dev'; // OLD
+const proxyUrl = 'https://idolon-proxy.YOUR-NAME.workers.dev'; // NEW
+
+// 3. REMOVE THE GATEKEEPER
+// Scroll to the bottom of app.js.
+// Delete or comment out the "Access Denied" logic block 
+// that checks for 'idolon.web.app'.</code></pre>
+                    </div>
+
+                    <div class="warning-callout">
+                        <strong>Important:</strong> Ensure you delete the "Gatekeeper" code block at the very bottom of `app.js` or the app will refuse to load on your own domain!
+                    </div>
+                </section>
+
+                <section id="step4" class="glass-card p-8 mb-8">
+                    <div class="flex items-center mb-4">
+                        <span class="step-badge">4</span>
+                        <h2 class="!mt-0 !mb-0 !border-0">Deployment</h2>
+                    </div>
+                    <p>You can host the frontend anywhere (Vercel, Netlify, GitHub Pages), but since you are already using Firebase, it's easiest to host it there.</p>
+
+                    <h3>1. Initialize Hosting</h3>
+                    <div class="code-block-wrapper">
+                        <div class="code-header"><span>Terminal (Project Root)</span> <button class="copy-btn"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                        <pre><code>firebase init hosting
+
+# 1. Select "Use an existing project" -> Choose your project
+# 2. What do you want to use as your public directory? -> . (current directory)
+# 3. Configure as a single-page app? -> No
+# 4. Set up automatic builds with GitHub? -> No
+# 5. File index.html already exists. Overwrite? -> No</code></pre>
+                    </div>
+
+                    <h3>2. Deploy</h3>
+                    <div class="code-block-wrapper">
+                        <div class="code-header"><span>Terminal</span> <button class="copy-btn"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                        <pre><code>firebase deploy --only hosting</code></pre>
+                    </div>
+                    
+                    <p class="mt-4"><strong>Success!</strong> Firebase will give you a Hosting URL (e.g., <code>https://idolon-my-instance.web.app</code>). Open it, sign in, and enjoy your private AI chat.</p>
+                </section>
+
+            </main>
+        </div>
+    </div>
+    
+    <footer class="text-center py-8 text-secondary text-sm">
+        <p>&copy; 2025 Idolon Open Source Project.</p>
+    </footer>
+
+    <script>
+        // --- Icons ---
+        lucide.createIcons();
+
+        // --- Theme Toggle ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        // Check local storage or system preference
+        const savedTheme = localStorage.getItem('idolon-theme');
+        if (savedTheme) {
+            html.setAttribute('data-mode', savedTheme);
+        } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+            html.setAttribute('data-mode', 'light');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-mode');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-mode', newTheme);
+            localStorage.setItem('idolon-theme', newTheme);
+        });
+
+        // --- Copy to Clipboard ---
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.parentElement.nextElementSibling.innerText;
+                navigator.clipboard.writeText(code);
+                
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i> Copied!';
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    lucide.createIcons();
+                }, 2000);
+            });
+        });
+
+        // --- Navigation Active State (Scrollspy) ---
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // --- Background Glow Animation ---
+        const glow1 = document.getElementById('glow1');
+        const glow2 = document.getElementById('glow2');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let targetX1 = mouseX, targetY1 = mouseY;
+        let targetX2 = mouseX, targetY2 = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        
+        function updateGlows() {
+            // Smooth follow effect
+            targetX1 += (mouseX - targetX1) * 0.04;
+            targetY1 += (mouseY - targetY1) * 0.04;
+            
+            // Second glow moves slower/differently for organic feel
+            targetX2 += (mouseX - targetX2) * 0.02;
+            targetY2 += (mouseY - targetY2) * 0.02;
+            
+            glow1.style.left = `${targetX1}px`;
+            glow1.style.top = `${targetY1}px`;
+            glow2.style.left = `${targetX2}px`;
+            glow2.style.top = `${targetY2}px`;
+            
+            requestAnimationFrame(updateGlows);
+        }
+        updateGlows();
+    </script>
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zyren Chat Backend Setup Guide</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #111827; --text-color: #e5e7eb; --header-bg: #1f2937; --header-text: #e5e7eb;
+            --ai-bubble-bg: #374151; --ai-bubble-text: #e5e7eb;
+            --input-bg: #1f2937; --input-text: #e5e7eb; --border-color: #374151; --icon-color: #9ca3af;
+            --font-family: 'Inter', sans-serif;
+            --hover-bg: rgba(255, 255, 255, 0.05);
+            --code-bg: #1f2937;
+            --scrollbar-thumb-color: #4b5563;
+        }
+        body { 
+            font-family: var(--font-family); 
+            background-color: var(--bg-color); 
+            color: var(--text-color);
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        h1, h2, h3 {
+            font-weight: 700;
+            color: var(--header-text);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        h1 { font-size: 2.25rem; }
+        h2 { font-size: 1.8rem; margin-top: 2.5rem; }
+        h3 { font-size: 1.25rem; margin-top: 1.5rem; border-bottom: none; }
+        
+        p, li {
+            font-size: 1rem;
+            color: var(--text-color);
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+        code {
+            background-color: var(--code-bg);
+            color: #f3f4f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        pre code {
+            padding: 0;
+            background: none;
+            font-size: 0.875rem;
+        }
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        strong {
+            color: #f3f4f6;
+            font-weight: 600;
+        }
+        .note {
+            background-color: var(--input-bg);
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin: 1.5rem 0;
+        }
+        .note p {
+            margin-bottom: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: var(--ai-bubble-bg);
+            border: 1px solid var(--border-color);
+            color: var(--icon-color);
+            padding: 0.3rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        pre:hover .copy-button {
+            opacity: 1;
+        }
+        .copy-button:hover {
+            background-color: #4b5563;
+        }
+        .copy-button svg {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold border-b-2 border-blue-500 pb-4 inline-block">Zyren Chat Backend Setup</h1>
+            <p class="text-lg opacity-80 mt-2">A guide to creating your own secure proxy for the Zyren Chat app.</p>
+        </header>
+
+        <section>
+            <h2>Introduction</h2>
+            <p>The Zyren Chat app is designed to work with a secure proxy server. This architecture is crucial for two reasons:</p>
+            <ul>
+                <li><strong>Security:</strong> It keeps your valuable API keys (Gemini, Groq, etc.) completely hidden from the frontend code. Exposing keys in client-side JavaScript is a major security risk.</li>
+                <li><strong>Control:</strong> It allows you to manage access, log usage, and prevent abuse, as all requests must pass through your controlled environment.</li>
+            </ul>
+            <p>This guide will walk you through a two-layer setup:</p>
+            <ol class="list-decimal pl-5 space-y-2">
+                <li>A <strong>Node.js Proxy Server</strong> that holds your API keys and makes the actual calls to the AI providers. We'll deploy this to a free service like Render.</li>
+                <li>A <strong>Cloudflare Worker</strong> that acts as a public-facing, serverless endpoint. It verifies that requests are coming from a legitimate, signed-in user before securely forwarding them to your Node.js server.</li>
+            </ol>
+            <div class="note">
+                <p><strong>Why two layers?</strong> The Cloudflare Worker provides a robust, scalable, and free first line of defense. It handles user authentication (via Firebase) at the edge, meaning unauthorized requests never even reach your Node.js server, saving you resources and adding a powerful layer of security.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Prerequisites</h2>
+            <ul>
+                <li>A <a href="https://nodejs.org/" target="_blank">Node.js</a> installation on your computer.</li>
+                <li>A code editor like <a href="https://code.visualstudio.com/" target="_blank">VS Code</a>.</li>
+                <li>A <a href="https://github.com/" target="_blank">GitHub</a> account.</li>
+                <li>A <a href="https://render.com/" target="_blank">Render</a> account (for deploying the Node.js server).</li>
+                <li>A <a href="https://cloudflare.com/" target="_blank">Cloudflare</a> account (for the Worker).</li>
+                <li>Your various AI provider API keys (Gemini, Groq, OpenRouter).</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>Part 1: The Node.js Proxy Server</h2>
+            <p>This server will be the heart of our backend. Its only job is to receive a request, attach the correct API key, and forward it to the specified AI service.</p>
+
+            <h3>Step 1: Project Setup</h3>
+            <p>Create a new folder for your server, open it in your terminal, and initialize a Node.js project.</p>
+            <pre><button class="copy-button" title="Copy code"><svg data-lucide="copy"></svg></button><code>mkdir zyren-proxy-server
+cd zyren-proxy-server
+npm init -y</code></pre>
+            <p>Now, install the necessary packages: <strong>Express</strong> for the web server, <strong>Axios</strong> for making HTTP requests, <strong>CORS</strong> for handling cross-origin requests, and <strong>dotenv</strong> for managing environment variables.</p>
+            <pre><button class="copy-button" title="Copy code"><svg data-lucide="copy"></svg></button><code>npm install express axios cors dotenv</code></pre>
+
+            <h3>Step 2: Create Environment File</h3>
+            <p>Create a file named <code>.env</code> in your project root. This is where you will store your secrets. <strong>Never commit this file to GitHub.</strong></p>
+            <pre><button class="copy-button" title="Copy code"><svg data-lucide="copy"></svg></button><code># .env
+
+# Your API Keys
+GEMINI_API_KEY="AIzaSy..."
+GROQ_API_KEY="gsk_..."
+OPENROUTER_API_KEY="sk-or-..."
+
+# A secret key to ensure requests are coming from YOUR Cloudflare Worker
+# Generate a strong, random string for this (e.g., from a password manager)
+PROXY_SECRET_KEY="your_super_secret_random_string_here"
+
+# The port the server will run on
+PORT=3000</code></pre>
+
+            <h3>Step 3: Write the Server Code</h3>
+            <p>Create a file named <code>index.js</code> and paste the following code into it. Read the comments to understand what each part does.</p>
+            <pre><button class="copy-button" title="Copy code"><svg data-lucide="copy"></svg></button><code>// index.js
+require('dotenv').config();
+const express = require('express');
+const axios = require('axios');
+const cors = require('cors');
+
+const app = express();
+app.use(express.json());
+app.use(cors()); // Enable CORS for all routes
+
+const PORT = process.env.PORT || 3000;
+const PROXY_SECRET = process.env.PROXY_SECRET_KEY;
+
+// Middleware to check for our secret header
+const checkSecret = (req, res, next) => {
+    const secret = req.headers['x-proxy-secret-key'];
+    if (!secret || secret !== PROXY_SECRET) {
+        return res.status(403).json({ error: 'Forbidden: Invalid or missing secret key.' });
+    }
+    next();
+};
+
+// The main proxy route. We apply our secret-checking middleware here.
+app.post('/proxy', checkSecret, async (req, res) => {
+    const { provider, payload } = req.body;
+
+    if (!provider || !payload) {
+        return res.status(400).json({ error: 'Missing provider or payload' });
+    }
+
+    try {
+        let response;
+        switch (provider) {
+            case 'gemini':
+                const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${payload.model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+                response = await axios.post(geminiUrl, { contents: payload.contents });
+                break;
+            case 'groq':
+                response = await axios.post('https://api.groq.com/openai/v1/chat/completions', payload, {
+                    headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }
+                });
+                break;
+            case 'openrouter':
+                response = await axios.post('https://openrouter.ai/api/v1/chat/completions', payload, {
+                    headers: { 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}` }
+                });
+                break;
+            default:
+                return res.status(400).json({ error: 'Unsupported provider' });
+        }
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Error with provider ${provider}:`, error.response ? error.response.data : error.message);
+        res.status(error.response?.status || 500).json({ 
+            error: error.response?.data?.error?.message || 'An error occurred on the proxy server.' 
+        });
+    }
+});
+
+// A simple health check route
+app.get('/', (req, res) => {
+    res.send('Zyren Proxy Server is running!');
+});
+
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+});</code></pre>
+
+            <h3>Step 4: Deploy the Server with Render</h3>
+            <ol class="list-decimal pl-5 space-y-2">
+                <li>Initialize a Git repository in your project folder and push it to a new repository on GitHub. Make sure you have a <code>.gitignore</code> file that includes <code>.env</code> and <code>node_modules/</code>.</li>
+                <li>Go to your Render dashboard and click "New" -> "Web Service".</li>
+                <li>Connect your GitHub account and select the repository you just created.</li>
+                <li>Give your service a name (e.g., `zyren-proxy`).</li>
+                <li>Render should auto-detect that it's a Node.js project. Set the <strong>Start Command</strong> to <code>node index.js</code>.</li>
+                <li>Go to the "Environment" tab and add all the variables from your <code>.env</code> file as "Environment Variables" (<strong>not</strong> Secret Files).</li>
+                <li>Click "Create Web Service". Render will build and deploy your server. Once it's live, copy the URL (e.g., <code>https://zyren-proxy.onrender.com</code>). You'll need this for the next part.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Part 2: The Cloudflare Worker</h2>
+            <p>This worker will be the secure, public-facing URL your Zyren Chat app calls. It will validate the user's Firebase Auth token before passing the request to your newly deployed Node.js server.</p>
+
+            <h3>Step 1: Create a Worker</h3>
+            <ol class="list-decimal pl-5 space-y-2">
+                <li>In your Cloudflare dashboard, go to "Workers & Pages".</li>
+                <li>Click "Create application", then "Create Worker".</li>
+                <li>Give your worker a name (e.g., `zyren-secure-proxy`) and click "Deploy".</li>
+                <li>Once deployed, click "Edit code". This will open the in-browser code editor.</li>
+            </ol>
+            
+            <h3>Step 2: Add the Worker Code</h3>
+            <p>Delete the boilerplate code and replace it with the following. This code is more complex as it handles JWT (JSON Web Token) validation using standard web APIs to verify the user's identity with Firebase.</p>
+            <pre><button class="copy-button" title="Copy code"><svg data-lucide="copy"></svg></button><code>// Cloudflare Worker Code
+// This code authenticates Firebase tokens and proxies requests.
+
+export default {
+  async fetch(request, env) {
+    // Handle CORS preflight requests
+    if (request.method === 'OPTIONS') {
+      return handleOptions(request);
+    }
+
+    // Check Authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Missing or invalid Authorization header' }), { status: 401, headers: corsHeaders() });
+    }
+
+    const token = authHeader.substring(7); // Remove "Bearer "
+    
+    try {
+      // Verify the Firebase Auth token
+      await verifyFirebaseToken(token, env.FIREBASE_PROJECT_ID);
+
+      // If token is valid, forward the request to the Node.js proxy
+      const body = await request.json();
+      
+      const proxyRequest = new Request(env.NODE_PROXY_URL + "/proxy", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Proxy-Secret-Key': env.PROXY_SECRET_KEY,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const proxyResponse = await fetch(proxyRequest);
+      const data = await proxyResponse.json();
+      
+      return new Response(JSON.stringify(data), {
+        status: proxyResponse.status,
+        headers: corsHeaders()
+      });
+
+    } catch (err) {
+      return new Response(JSON.stringify({ error: `Authentication failed: ${err.message}` }), { status: 403, headers: corsHeaders() });
+    }
+  },
+};
+
+// --- Helper Functions ---
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*', // Or lock down to your specific domain
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+  };
+}
+
+function handleOptions(request) {
+  if (
+    request.headers.get('Origin') !== null &&
+    request.headers.get('Access-Control-Request-Method') !== null &&
+    request.headers.get('Access-Control-Request-Headers') !== null
+  ) {
+    return new Response(null, { headers: corsHeaders() });
+  } else {
+    return new Response(null, { headers: { Allow: 'POST, OPTIONS' } });
+  }
+}
+
+// Firebase JWT Verification Logic
+async function verifyFirebaseToken(token, projectId) {
+  const parts = token.split('.');
+  if (parts.length !== 3) throw new Error('Invalid token structure');
+  
+  const header = JSON.parse(atob(parts[0]));
+  const payload = JSON.parse(atob(parts[1]));
+
+  // Check standard JWT claims
+  const now = Math.floor(Date.now() / 1000);
+  if (payload.iat > now || payload.exp < now) throw new Error('Token has expired or is not yet valid');
+  if (payload.aud !== projectId) throw new Error('Token audience does not match project ID');
+  if (payload.iss !== `https://securetoken.google.com/${projectId}`) throw new Error('Token issuer is incorrect');
+  if (!payload.sub) throw new Error('Token is missing subject claim');
+  
+  // Get Google's public keys to verify signature
+  const keys = await getGooglePublicKeys();
+  const key = keys[header.kid];
+  if (!key) throw new Error('Token signed by an unknown key');
+
+  const keyData = await crypto.subtle.importKey(
+    'jwk',
+    { kty: 'RSA', n: key.n, e: key.e },
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['verify']
+  );
+
+  const signature = new Uint8Array(atob(parts[2].replace(/_/g, '/').replace(/-/g, '+')).split('').map(c => c.charCodeAt(0)));
+  const dataToVerify = new TextEncoder().encode(`${parts[0]}.${parts[1]}`);
+
+  const isValid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', keyData, signature, dataToVerify);
+  if (!isValid) throw new Error('Token signature is invalid');
+
+  return payload;
+}
+
+// Fetches and caches Google's public keys
+let googlePublicKeys;
+let lastKeyFetchTime = 0;
+async function getGooglePublicKeys() {
+  const now = Date.now();
+  // Cache keys for 1 hour
+  if (googlePublicKeys && (now - lastKeyFetchTime < 3600000)) {
+    return googlePublicKeys;
+  }
+
+  const response = await fetch('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com');
+  const certs = await response.json();
+  
+  const keys = {};
+  for (const [kid, cert] of Object.entries(certs)) {
+    const pem = cert.replace(/-----BEGIN CERTIFICATE-----/, '').replace(/-----END CERTIFICATE-----/, '').replace(/\s/g, '');
+    const der = new Uint8Array(atob(pem).split('').map(c => c.charCodeAt(0))).buffer;
+    const publicKey = await crypto.subtle.importKey('spki', der, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+    const jwk = await crypto.subtle.exportKey('jwk', publicKey);
+    keys[kid] = jwk;
+  }
+  
+  googlePublicKeys = keys;
+  lastKeyFetchTime = now;
+  return keys;
+}</code></pre>
+
+            <h3>Step 3: Configure Worker Secrets</h3>
+            <p>Your worker needs to know where your Node.js server is and what the secret key is. We add these as secure environment variables.</p>
+            <ol class="list-decimal pl-5 space-y-2">
+                <li>In the worker editor view, go to "Settings" -> "Variables".</li>
+                <li>Under "Environment Variable Bindings", click "Add variable".
+                    <ul>
+                        <li>Variable name: <code>NODE_PROXY_URL</code>, Value: The URL of your deployed Render server (e.g., <code>https://zyren-proxy.onrender.com</code>).</li>
+                        <li>Variable name: <code>PROXY_SECRET_KEY</code>, Value: The same secret key you put in your <code>.env</code> file.</li>
+                        <li>Variable name: <code>FIREBASE_PROJECT_ID</code>, Value: Your Firebase Project ID (e.g., `zyrenchat`). You can find this in your Firebase project settings.</li>
+                    </ul>
+                </li>
+                <li>Make sure to click "Encrypt" for the secret key for added security. Save and deploy your changes.</li>
+            </ol>
+             <p>Once deployed, Cloudflare will give you a URL for your worker (e.g., <code>https://zyren-secure-proxy.your-user.workers.dev</code>). This is the final URL you'll use in the app.</p>
+        </section>
+
+        <section>
+            <h2>Part 3: Connecting the Zyren Chat Frontend</h2>
+            <p>This is the final step! You just need to tell the Zyren Chat app to use your new Cloudflare Worker URL instead of the default one.</p>
+            <p>Open your <code>index.html</code> file, find the <code>callApiThroughProxy</code> function, and change the <code>proxyUrl</code> variable.</p>
+            <pre><button class="copy-button" title="Copy code"><svg data-lucide="copy"></svg></button><code>async function callApiThroughProxy(provider, payload) {
+    // Change this URL to your deployed Cloudflare Worker URL
+    const proxyUrl = 'https://zyren-secure-proxy.your-user.workers.dev';
+    
+    if (!currentUser) {
+        throw new Error("You must be signed in to send messages securely.");
+    }
+    // ... rest of the function remains the same
+}</code></pre>
+            <p>Save the file, and that's it! Your Zyren Chat application is now running entirely on your own secure, self-hosted backend infrastructure.</p>
+        </section>
+
+        <footer class="text-center mt-12 border-t border-gray-700 pt-6">
+            <p class="text-sm opacity-60">Congratulations on setting up your secure backend!</p>
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        document.querySelectorAll('pre').forEach(pre => {
+            const button = pre.querySelector('.copy-button');
+            if (button) {
+                button.addEventListener('click', () => {
+                    const code = pre.querySelector('code').innerText;
+                    navigator.clipboard.writeText(code).then(() => {
+                        button.innerHTML = `<svg data-lucide="check"></svg>`;
+                        setTimeout(() => {
+                            button.innerHTML = `<svg data-lucide="copy"></svg>`;
+                            lucide.createIcons({nodes: [button]});
+                        }, 2000);
+                        lucide.createIcons({nodes: [button]});
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
