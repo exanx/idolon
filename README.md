@@ -4,7 +4,7 @@ Idolon is a powerful, client-side-first AI chat interface designed for immersive
 
 **Idolon is fully open-source and free.** There are no paywalls or locked features. You bring your own API keys, and you own your data.
 
-![App Screenshot](https://placehold.co/800x400?text=Idolon+Chat+Interface) *(Replace this link with a real screenshot of your app)*
+![App Screenshot](https://placehold.co/800x400?text=Idolon+Chat+Interface)
 
 ## ✨ Key Capabilities
 
